@@ -7,6 +7,7 @@ import puni
 import datetime
 import urllib.parse
 import psycopg2
+import time
 from imgurpython import ImgurClient
 from slacksocket import SlackSocket
 import matplotlib.pyplot as plt
@@ -25,6 +26,7 @@ class BotMod:
         self.listening = False
         self.channel = None
         self.subreddit = None
+        self.refreshing = True
         self.usergroup_owner = ['santi871']
         self.usergroup_mod = ['santi871', 'akuthia', 'mason11987', 'mike_pants', 'mjcapples', 'securethruobscure', 'snewzie', 'teaearlgraycold', 'thom.willard']
 
@@ -53,8 +55,8 @@ class BotMod:
 
         self.cur = self.conn.cursor()
 
-        self.cur.execute('CREATE TABLE IF NOT EXISTS SHADOWBANS (ID SERIAL PRIMARY KEY, USERNAME TEXT UNIQUE, REASON TEXT, DATE TEXT, BY TEXT)')
         self.cur.execute('CREATE TABLE IF NOT EXISTS MODMAIL (ID SERIAL PRIMARY KEY, URL TEXT UNIQUE, AUTHOR TEXT, SUBJECT TEXT, BODY TEXT, DATE TEXT)')
+        self.cur.execute('CREATE TABLE IF NOT EXISTS SHADOWBANS (ID SERIAL PRIMARY KEY, USERNAME TEXT UNIQUE, REASON TEXT, DATE TEXT, BY TEXT)')
         self.cur.execute('CREATE TABLE IF NOT EXISTS BANS (ID SERIAL PRIMARY KEY, USERNAME TEXT UNIQUE, LENGTH TEXT, REASON TEXT, AUTHOR TEXT, DATE TEXT)')
 
         print("Connected to database.")
@@ -193,7 +195,7 @@ class BotMod:
 
                         self.r.edit_wiki_page(self.subreddit, "config/automoderator", newstr, reason='ELI5_ModBot shadowban user "/u/%s" executed by "/u/%s"' % (username, sender))
 
-                        msg = self.s.send_msg('Shadowbanned user.', channel_name=self.channel)
+                        msg = self.s.send_msg('Shadowbanned user: ' + "https://www.reddit.com/user/" + username, channel_name=self.channel)
 
                     except Exception as e:
                         msg = self.s.send_msg('Failed to shadowban user.', channel_name=self.channel)
@@ -336,6 +338,68 @@ class BotMod:
 
         msg = self.s.send_msg('Loaded %d ban entries into database.' % entryCount, channel_name=self.channel)
 
+    def refreshModmail(self, limit=50):
+
+        while self.refreshing:
+
+            try:
+
+                for modmail in self.r.get_mod_mail("explainlikeimfive", limit=limit):
+
+                    link = "https://www.reddit.com/message/messages/%s"  % modmail.id
+
+                    try:
+                        self.cur.execute('''INSERT INTO MODMAIL(URL, AUTHOR, SUBJECT, BODY,DATE) VALUES(%s,%s,%s,%s,%s)''', (link, modmail.author.name,modmail.subject, modmail.body, datetime.datetime.utcfromtimestamp(float(modmail.created_utc))))
+
+                    except Exception:
+                        pass
+
+                    self.conn.commit()
+
+                    for reply in modmail.replies:
+
+                        link = "https://www.reddit.com/message/messages/%s"  % reply.id
+
+                        try: 
+                            self.cur.execute('''INSERT INTO MODMAIL(URL, AUTHOR, SUBJECT, BODY,DATE) VALUES(%s,%s,%s,%s,%s)''', (link, reply.author.name,reply.subject, reply.body, datetime.datetime.utcfromtimestamp(float(reply.created_utc))))
+
+                        except Exception:
+                            pass
+
+                        self.conn.commit()
+
+            except:
+                pass
+                    
+            time.sleep(30)
+
+    def refreshBans(self, limit=50):
+
+        while self.refreshing:
+
+            try:
+
+                for banned in self.r.get_mod_log("explainlikeimfive", action="banuser", limit=limit):
+
+                    try:
+                        self.cur.execute('''INSERT INTO BANS(USERNAME, LENGTH, REASON, AUTHOR, DATE) VALUES(%s,%s,%s,%s,%s)''', (banned.target_author,banned.details, banned.description, banned.mod, datetime.datetime.utcfromtimestamp(float(banned.created_utc))))              
+
+                    except Exception:
+                        pass
+
+                    self.conn.commit()
+
+            except:
+                pass
+
+            time.sleep(30)
+
+    def listFromDatabase(self, table):
+
+        self.cur.execute('SELECT * FROM %s' % table)
+        entryTuples = self.cur.fetchall()
+                
+
     def summary(self, username):
 
         i=0
@@ -406,7 +470,8 @@ class BotMod:
         msg = self.s.send_msg("Showing summary for /u/" + username + ". Total comments read: %d" % totalCommentsRead, channel_name=self.channel)
         msg = self.s.send_msg(link['link'], channel_name=self.channel)
         msg = self.s.send_msg("Average karma: %d" % (totalKarma/totalCommentsRead), channel_name=self.channel)
-        
+        msg = self.s.send_msg('User profile: ' + "https://www.reddit.com/user/" + username, channel_name=self.channel)
+                
         plt.clf()
         
 
