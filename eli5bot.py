@@ -2,14 +2,12 @@ import praw
 import OAuth2Util
 import sys
 import os
-import signal
 import puni
 import datetime
 import urllib.parse
 import psycopg2
 import time
 from imgurpython import ImgurClient
-from slacksocket import SlackSocket
 import matplotlib.pyplot as plt
 
 
@@ -55,11 +53,19 @@ class BotMod:
 
         self.cur = self.conn.cursor()
 
-        self.cur.execute('CREATE TABLE IF NOT EXISTS MODMAIL (ID SERIAL PRIMARY KEY, URL TEXT UNIQUE, AUTHOR TEXT, SUBJECT TEXT, BODY TEXT, DATE TEXT)')
-        self.cur.execute('CREATE TABLE IF NOT EXISTS SHADOWBANS (ID SERIAL PRIMARY KEY, USERNAME TEXT UNIQUE, REASON TEXT, DATE TEXT, BY TEXT)')
-        self.cur.execute('CREATE TABLE IF NOT EXISTS BANS (ID SERIAL PRIMARY KEY, USERNAME TEXT UNIQUE, LENGTH TEXT, REASON TEXT, AUTHOR TEXT, DATE TEXT)')
+        self.cur.execute(
+            "CREATE TABLE IF NOT EXISTS MODMAIL (ID SERIAL PRIMARY KEY, URL TEXT UNIQUE, AUTHOR TEXT, SUBJECT TEXT, BODY TEXT, DATE TEXT)")
+        self.cur.execute(
+            "CREATE TABLE IF NOT EXISTS SHADOWBANS "
+            "(ID SERIAL PRIMARY KEY,"
+            "USERNAME TEXT UNIQUE,"
+            "REASON TEXT, "
+            "DATE TEXT, "
+            "BY TEXT)")
+        self.cur.execute(
+            "CREATE TABLE IF NOT EXISTS BANS (ID SERIAL PRIMARY KEY, USERNAME TEXT UNIQUE, LENGTH TEXT, REASON TEXT, AUTHOR TEXT, DATE TEXT)")
 
-        print("Connected to database.")
+        print("Connected to database")
 
         self.startBot()
 
@@ -71,7 +77,9 @@ class BotMod:
         else:
             self.channel = "general"
             self.subreddit = "explainlikeimfive"
-            
+
+        self.subreddit2 = self.r.get_subreddit(self.subreddit)
+        self.un = puni.UserNotes(self.r, self.subreddit2)
 
         msg = self.s.send_msg("Ready.", channel_name=self.channel)
         print("Ready")
@@ -177,15 +185,11 @@ class BotMod:
                     username = splitContentTwice[1]
                     reason = splitContentTwice[2]
                     date = str(datetime.datetime.utcnow())
-
-                    subreddit2 = self.r.get_subreddit(self.subreddit)
-
-                    un = puni.UserNotes(self.r, subreddit2)
-
+          
                     try:
                         self.cur.execute('''INSERT INTO SHADOWBANS(USERNAME, REASON, DATE, BY) VALUES(%s,%s,%s,%s)''', (username,reason, date, sender))
                         n = puni.Note(username,"Shadowbanned, reason: %s" % reason,sender,'','botban')
-                        un.add_note(n)
+                        self.un.add_note(n)
 
                         replacement = ', "%s"]' % username
 
@@ -338,7 +342,7 @@ class BotMod:
 
         msg = self.s.send_msg('Loaded %d ban entries into database.' % entryCount, channel_name=self.channel)
 
-    def refreshModmail(self, limit=50):
+    def refreshModmail(self, limit=15):
 
         while self.refreshing:
 
@@ -373,7 +377,7 @@ class BotMod:
                     
             time.sleep(30)
 
-    def refreshBans(self, limit=50):
+    def refreshBans(self, limit=5):
 
         while self.refreshing:
 
@@ -382,7 +386,9 @@ class BotMod:
                 for banned in self.r.get_mod_log("explainlikeimfive", action="banuser", limit=limit):
 
                     try:
-                        self.cur.execute('''INSERT INTO BANS(USERNAME, LENGTH, REASON, AUTHOR, DATE) VALUES(%s,%s,%s,%s,%s)''', (banned.target_author,banned.details, banned.description, banned.mod, datetime.datetime.utcfromtimestamp(float(banned.created_utc))))              
+                        self.cur.execute('''INSERT INTO BANS(USERNAME, LENGTH, REASON, AUTHOR, DATE) VALUES(%s,%s,%s,%s,%s)''', (banned.target_author,banned.details, banned.description, banned.mod, datetime.datetime.utcfromtimestamp(float(banned.created_utc))))
+                        n = puni.Note(banned.target_author, "Banned: %s" % banned.description,banned.mod,'','ban')
+                        self.un.add_note(n)
 
                     except Exception:
                         pass
@@ -414,6 +420,8 @@ class BotMod:
         limit = 500
         user = self.r.get_redditor(username)
         totalKarma = 0
+        x = []
+        y = []
 
         for comment in user.get_comments(limit=limit):
 
@@ -425,6 +433,9 @@ class BotMod:
             subredditTotal.append(displayname)
 
             totalKarma = totalKarma + int(comment.score)
+
+            x.append(datetime.datetime.utcfromtimestamp(float(comment.created_utc)))
+            y.append(comment.score)
             
             i+=1
 
@@ -456,9 +467,17 @@ class BotMod:
         labels = orderedSubredditNames
         sizes = orderedCommentsInSubreddit
         colors = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral', 'teal', 'chocolate', 'olivedrab', 'tan']
+        plt.subplot(211)
+        plt.rcParams['font.size'] = 8
         plt.pie(sizes, labels=labels, colors=colors,
                 autopct=None, shadow=True, startangle=90)
         plt.axis('equal')
+        plt.subplot(212)
+        plt.rcParams['font.size'] = 10
+        plt.plot_date(x, y)
+        plt.grid()
+        plt.xlabel('Comment date')
+        plt.ylabel('Karma of comment')
 
         filename = username + "_summary.png"
 
