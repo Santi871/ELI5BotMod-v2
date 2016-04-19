@@ -16,12 +16,6 @@ import threading
 # THIS IS THE DEV BRANCH
 
 
-def create_thread(method):
-    thread = CreateThread(1, str(method) + " thread", BotMod.method)
-    thread.start()
-    time.sleep(2)
-
-
 class CreateThread(threading.Thread):
     def __init__(self, thread_id, name, method):
         threading.Thread.__init__(self)
@@ -113,7 +107,13 @@ class BotMod:
 
         print("Successfully connected.")
 
-    @create_thread
+    @staticmethod
+    def create_thread(method):
+
+        thread = CreateThread(1, str(method) + " thread", method)
+        thread.start()
+        time.sleep(2)
+
     def listen_to_chat(self):
 
         self.listening = True
