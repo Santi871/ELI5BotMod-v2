@@ -34,14 +34,30 @@ def main():
         msg = s.send_msg('Failed to start bot.\n Exception: %s' % e, channel_name="eli5bot-dev")
         sys.exit()
 
+    time.sleep(2)
+
     listenerThread = myThread(1, "Event listener", botmod, botmod.listenToChat)
     listenerThread.start()
+
+    time.sleep(2)
 
     modmailThread = myThread(2, "Modmail logger", botmod, botmod.refreshModmail)
     modmailThread.start()
 
+    time.sleep(2)
+
     bansThread = myThread(3, "Bans logger", botmod, botmod.refreshBans)
     bansThread.start()
+
+    time.sleep(2)
+
+    repostThread = myThread(4, "Repost detector", botmod, botmod.repost_detector)
+    repostThread.start()
+
+    time.sleep(2)
+
+    reportsThread = myThread(5, "Report checker", botmod, botmod.check_reports)
+    reportsThread.start()
 
 if __name__ == '__main__':
     main()
