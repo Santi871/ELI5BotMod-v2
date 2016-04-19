@@ -77,7 +77,6 @@ class BotMod:
 
         self.conn.commit()
 
-
         print("Connected to database")
 
         self.startBot()
@@ -94,7 +93,6 @@ class BotMod:
         self.subreddit2 = self.r.get_subreddit(self.subreddit)
         self.un = puni.UserNotes(self.r, self.subreddit2)
 
-        msg = self.s.send_msg("Successfully connected.", channel_name="eli5bot-dev")
         print("Successfully connected.")
 
     def listenToChat(self):
@@ -171,21 +169,6 @@ class BotMod:
                                  '!shutdown: exit the bot script\n'
                                  '!reboot: reboot the bot script\n'
                                  '---Made by /u/Santi871 using SlackSocket + PRAW in Python 3.5', channel_name=self.channel)
-
-        #elif splitContent[0]=="!lock": #LOCK THREADS
-
-            #msg = self.s.send_msg('Locking thread id: %s with reason "%s"...' % (splitContentTwice[1], splitContentTwice[2]), channel_name=self.channel)
-
-            #try:
-                #submission = self.r.get_submission(submission_id=splitContentTwice[1])
-                #comment = submission.add_comment(splitContentTwice[2])
-                #comment.sticky()
-                #submission.lock()
-                #msg = self.s.send_msg('Thread locked successfully.', channel_name=self.channel)
-
-            #except Exception as e:
-                #msg = self.s.send_msg('Failed to lock thread.', channel_name=self.channel)
-                #msg = self.s.send_msg('Exception: %s' % e, channel_name=self.channel)
 
         elif splitContent[0]=="!shadowban": #SHADOWBAN
 
