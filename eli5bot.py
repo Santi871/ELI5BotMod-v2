@@ -17,11 +17,12 @@ import threading
 
 
 class CreateThread(threading.Thread):
-    def __init__(self, threadID, name, method):
+    def __init__(self, thread_id, name, method):
         threading.Thread.__init__(self)
-        self.threadID = threadID
+        self.threadID = thread_id
         self.name = name
         self.method = method
+
     def run(self):
         print("Starting " + self.name)
         methodToRun = self.method()
@@ -113,6 +114,7 @@ class BotMod:
         thread.start()
         time.sleep(2)
 
+    @create_thread
     def listen_to_chat(self):
 
         self.listening = True
