@@ -16,6 +16,13 @@ import threading
 # THIS IS THE DEV BRANCH
 
 
+def create_thread(method):
+
+    thread = CreateThread(1, str(method) + " thread", method)
+    thread.start()
+    time.sleep(2)
+
+
 class CreateThread(threading.Thread):
     def __init__(self, thread_id, name, method):
         threading.Thread.__init__(self)
@@ -106,12 +113,6 @@ class BotMod:
         self.un = puni.UserNotes(self.r, self.subreddit2)
 
         print("Successfully connected.")
-
-    def create_thread(self, method):
-
-        thread = CreateThread(1, str(method) + " thread", method)
-        thread.start()
-        time.sleep(2)
 
     @create_thread
     def listen_to_chat(self):
