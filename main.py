@@ -1,31 +1,16 @@
 import sys
 import eli5bot
 import os
-import threading
 import time
+import configparser
 from slacksocket import SlackSocket
 
-class myThread(threading.Thread):
-    def __init__(self, threadID, name, botmod, method):
-        threading.Thread.__init__(self)
-        self.threadID = threadID
-        self.name = name
-        self.botmod = botmod
-        self.method = method
-    def run(self):
-        print("Starting " + self.name)
-        methodToRun = self.method()
-        print("Exiting " + self.name)
-    
 
 def main():
     s = SlackSocket(os.environ['SLACK_TOKEN'],translate=True)
 
-    #Running = True
-
-    #while Running:
-
-    botmod = None
+    # config = configparser.ConfigParser()
+    # config.read('config.ini')
 
     try:
         botmod = eli5bot.BotMod(s)
@@ -35,28 +20,9 @@ def main():
 
     time.sleep(2)
 
-    listenerThread = myThread(1, "Event listener", botmod, botmod.listenToChat)
-    listenerThread.start()
-
-    time.sleep(2)
-
-    modmailThread = myThread(2, "Modmail logger", botmod, botmod.refreshModmail)
-    modmailThread.start()
-
-    time.sleep(2)
-
-    bansThread = myThread(3, "Bans logger", botmod, botmod.refreshBans)
-    bansThread.start()
-
-    time.sleep(2)
-
-    repostThread = myThread(4, "Repost detector", botmod, botmod.repost_detector)
-    repostThread.start()
-
-    time.sleep(2)
-
-    reportsThread = myThread(5, "Report checker", botmod, botmod.check_reports)
-    reportsThread.start()
+    botmod.create_thread(botmod.listen_to_chat)
+    botmod.create_thread(botmod.repost_detector)
+    botmod.create_thread(botmod.check_reports)
 
 if __name__ == '__main__':
     main()
