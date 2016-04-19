@@ -18,7 +18,7 @@ def main():
 
     botmod.create_thread(botmod.listen_to_chat)
     botmod.create_thread(botmod.repost_detector)
-    botmod.create_thread(botmod.check_reports())
+    botmod.create_thread(botmod.check_reports)
 
 if __name__ == '__main__':
     main()
