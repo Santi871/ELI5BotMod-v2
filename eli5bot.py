@@ -11,8 +11,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 import nltk
+import threading
 
 # THIS IS THE DEV BRANCH
+
+
+class CreateThread(threading.Thread):
+    def __init__(self, threadID, name, method):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.name = name
+        self.method = method
+    def run(self):
+        print("Starting " + self.name)
+        methodToRun = self.method()
+        print("Exiting " + self.name)
 
 
 class BotMod:
@@ -66,7 +79,8 @@ class BotMod:
             "DATE TEXT)")
 
         self.cur.execute(
-            "CREATE TABLE IF NOT EXISTS MODMAIL (ID SERIAL PRIMARY KEY, URL TEXT UNIQUE, AUTHOR TEXT, SUBJECT TEXT, BODY TEXT, DATE TEXT)")
+            "CREATE TABLE IF NOT EXISTS MODMAIL (ID SERIAL PRIMARY KEY, URL TEXT UNIQUE, AUTHOR TEXT,"
+            " SUBJECT TEXT, BODY TEXT, DATE TEXT)")
         self.cur.execute(
             "CREATE TABLE IF NOT EXISTS SHADOWBANS"
             "(ID SERIAL PRIMARY KEY,"
@@ -75,15 +89,16 @@ class BotMod:
             "DATE TEXT, "
             "BY TEXT)")
         self.cur.execute(
-            "CREATE TABLE IF NOT EXISTS BANS (ID SERIAL PRIMARY KEY, USERNAME TEXT UNIQUE, LENGTH TEXT, REASON TEXT, AUTHOR TEXT, DATE TEXT)")
+            "CREATE TABLE IF NOT EXISTS BANS (ID SERIAL PRIMARY KEY, USERNAME TEXT UNIQUE, LENGTH TEXT,"
+            " REASON TEXT, AUTHOR TEXT, DATE TEXT)")
 
         self.conn.commit()
 
         print("Connected to database")
 
-        self.startBot()
+        self.start_bot()
 
-    def startBot(self):
+    def start_bot(self):
 
         if self.devmode:
             #self.channel = "eli5bot-dev"
@@ -97,7 +112,13 @@ class BotMod:
 
         print("Successfully connected.")
 
-    def listenToChat(self):
+    @staticmethod
+    def create_thread(method):
+
+        thread = CreateThread(1, "Generic thread", method)
+        thread.start()
+
+    def listen_to_chat(self):
 
         self.listening = True
 
@@ -112,10 +133,9 @@ class BotMod:
                 self.channel = slack_event.get('channel')
 
                 try:
-                    foundCommand = content.find("!")
+                    found_command = content.find("!")
 
-                    if foundCommand == 0:
-
+                    if found_command == 0:
                         self.handleCommand(content, sender)
                 except:
                     pass
@@ -124,36 +144,36 @@ class BotMod:
 
     def handleCommand(self, content, sender):
 
-        splitContentTwice = content.split(' ', 2)
-        splitContent = content.split()
+        split_content_twice = content.split(' ', 2)
+        split_content = content.split()
 
-        command = splitContent[0]
+        command = split_content[0]
 
         try:
-            self.command(command, splitContent, splitContentTwice, sender)
+            self.command(command, split_content, split_content_twice, sender)
         except Exception as e:
             msg = self.s.send_msg('Failed to run command.\n Exception: %s' % e, channel_name=self.channel)
 
 
-    def command(self, command, splitContent, splitContentTwice, sender):
+    def command(self, command, split_content, split_content_twice, sender):
 
-        #COMMAND LIST STARTS HERE
+        # COMMAND LIST STARTS HERE
 
-        if command == "!shutdown":#SHUTDOWN
+        if command == "!shutdown":  # SHUTDOWN
 
             if sender in self.usergroup_owner:
                 self.shutdown()
             else:
                 msg = self.s.send_msg('You are not authorized to run that command.', channel_name=self.channel)
 
-        elif command == "!reboot":#REBOOT
+        elif command == "!reboot":  # REBOOT
 
             if sender in self.usergroup_owner:
                 self.reboot()
             else:
                 msg = self.s.send_msg('You are not authorized to run that command.', channel_name=self.channel)
 
-        elif command == "!stoplistening": #STOP LISTENING
+        elif command == "!stoplistening":  # STOP LISTENING
 
             if sender in self.usergroup_owner:
                 msg = self.s.send_msg('Stopping to listen...', channel_name=self.channel)
@@ -164,42 +184,49 @@ class BotMod:
         elif command =="!help":#HELP
 
             print(self.channel)
-            msg = self.s.send_msg(#'!lock [submission_id] [reason_to_sticky]: Locks thread and stickies reason in it as a comment\n'
-                                 '!shadowban [user] [reason]: Shadowbans user and adds usernote with reason - USERNAME IS CASE SENSITIVE!\n'
-                                 '!load [thing] [limit]: Load entries of [thing] into database. [limit] defines how many entries to fetch from reddit. Default limit is None. Current things: modmail, bans.\n'
-                                 '!summary [user]: generates a summary of [user]\n'
-                                 '!shutdown: exit the bot script\n'
-                                 '!reboot: reboot the bot script\n'
-                                 '---Made by /u/Santi871 using SlackSocket + PRAW in Python 3.5', channel_name=self.channel)
+            msg = self.s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
+                                  ' usernote with reason - USERNAME IS CASE SENSITIVE!\n'
+                                  '!summary [user]: generates a summary of [user]\n'
+                                  '!shutdown: exit the bot script\n'
+                                  '!reboot: reboot the bot script\n'
+                                  '---Made by /u/Santi871 using SlackSocket + PRAW in Python 3.5',
+                                  channel_name=self.channel)
 
-        elif splitContent[0]=="!shadowban": #SHADOWBAN
+        elif split_content[0]== "!shadowban":  # SHADOWBAN
 
             if sender in self.usergroup_mod:
 
-                if len(splitContentTwice)==3:
+                if len(split_content_twice)==3:
                     wiki_page = self.r.get_wiki_page(self.subreddit, "config/automoderator")
                     wiki_page_content = wiki_page.content_md
 
                     begInd = wiki_page_content.find("shadowbans")
                     endInd = wiki_page_content.find("#end shadowbans", begInd)
-                    username = splitContentTwice[1]
-                    reason = splitContentTwice[2]
+                    username = split_content_twice[1]
+                    reason = split_content_twice[2]
                     date = str(datetime.datetime.utcnow())
 
                     try:
-                        self.cur.execute('''INSERT INTO SHADOWBANS(USERNAME, REASON, DATE, BY) VALUES(%s,%s,%s,%s)''', (username,reason, date, sender))
+                        self.cur.execute('''INSERT INTO SHADOWBANS(USERNAME, REASON, DATE, BY) VALUES(%s,%s,%s,%s)''',
+                                         (username,reason, date, sender))
                         n = puni.Note(username,"Shadowbanned, reason: %s" % reason,sender,'','botban')
                         self.un.add_note(n)
 
                         replacement = ', "%s"]' % username
 
-                        msg = self.s.send_msg('Shadowbanning user "%s" for reason "%s"...' % (splitContentTwice[1], splitContentTwice[2]), channel_name=self.channel)
+                        msg = self.s.send_msg('Shadowbanning user "%s" for reason "%s"...' % (split_content_twice[1],
+                                                                                              split_content_twice[2]),
+                                              channel_name=self.channel)
 
-                        newstr = wiki_page_content[:begInd] + wiki_page_content[begInd:endInd].replace("]", replacement) + wiki_page_content[endInd:]
+                        newstr = wiki_page_content[:begInd] + \
+                                 wiki_page_content[begInd:endInd].replace("]", replacement) + wiki_page_content[endInd:]
 
-                        self.r.edit_wiki_page(self.subreddit, "config/automoderator", newstr, reason='ELI5_ModBot shadowban user "/u/%s" executed by "/u/%s"' % (username, sender))
+                        self.r.edit_wiki_page(self.subreddit, "config/automoderator", newstr,
+                                              reason='ELI5_ModBot shadowban user "/u/%s" executed by "/u/%s"'
+                                                     % (username, sender))
 
-                        msg = self.s.send_msg('Shadowbanned user: ' + "https://www.reddit.com/user/" + username, channel_name=self.channel)
+                        msg = self.s.send_msg('Shadowbanned user: ' + "https://www.reddit.com/user/" + username,
+                                              channel_name=self.channel)
 
                     except Exception as e:
                         msg = self.s.send_msg('Failed to shadowban user.', channel_name=self.channel)
@@ -213,60 +240,26 @@ class BotMod:
             else:
                 msg = self.s.send_msg('You are not authorized to run that command.', channel_name=self.channel)
 
-        elif splitContent[0]=="!load": #LOAD
-
-            if splitContent[1]=="modmail": # LOAD MODMAIL
-
-                if len(splitContent)==3:
-
-                    limit = int(splitContent[2])
-
-                else:
-
-                    limit = None
-
-                try:
-                    self.loadModmail(limit)
-                except Exception as e:
-                    msg = self.s.send_msg('Failed to load modmail.', channel_name=self.channel)
-                    msg = self.s.send_msg('Exception: %s' % e, channel_name=self.channel)
-
-            if splitContent[1]=="bans": # LOAD BANS
-
-                if len(splitContent)==3:
-
-                    limit = int(splitContent[2])
-
-                else:
-
-                    limit = None
-
-                try:
-                    self.loadBans(limit)
-                except Exception as e:
-                    msg = self.s.send_msg('Failed to load bans.', channel_name=self.channel)
-                    msg = self.s.send_msg('Exception: %s' % e, channel_name=self.channel)
-
-
-        elif splitContent[0]=="!delete":#DELETE ROWS FROM TABLE
+        elif split_content[0]== "!delete":  # DELETE ROWS FROM TABLE
 
             if sender in self.usergroup_owner:
 
                 try:
-                    self.cur.execute('DELETE FROM %s' % splitContent[1])
+                    self.cur.execute('DELETE FROM %s' % split_content[1])
                     self.conn.commit()
-                    msg = self.s.send_msg('Successfully deleted all entries from %s' % splitContent[1], channel_name=self.channel)
+                    msg = self.s.send_msg('Successfully deleted all entries from %s' % split_content[1],
+                                          channel_name=self.channel)
 
                 except Exception as e:
                     msg = self.s.send_msg('Failed to delete entries.', channel_name=self.channel)
                     msg = self.s.send_msg('Exception: %s' % e, channel_name=self.channel)
 
-        elif splitContent[0]=="!summary":#SUMMARY
+        elif split_content[0]== "!summary":  # SUMMARY
 
 
             try:
                 msg = self.s.send_msg('Generating summary, please allow a few seconds...', channel_name=self.channel)
-                self.summary(splitContent[1])
+                self.summary(split_content[1])
 
 
             except Exception as e:
@@ -290,124 +283,16 @@ class BotMod:
         self.conn.close()
         self.listening = False
 
-    def loadModmail(self, limit):
-
-        entryCount = 0
-
-        msg = self.s.send_msg('Loading modmail into database...', channel_name=self.channel)
-
-        for modmail in self.r.get_mod_mail(self.subreddit, limit=limit):
-
-            link = "https://www.reddit.com/message/messages/%s"  % modmail.id
-
-            try:
-                self.cur.execute('''INSERT INTO MODMAIL(URL, AUTHOR, SUBJECT, BODY,DATE) VALUES(%s,%s,%s,%s,%s)''', (link, modmail.author.name,modmail.subject, modmail.body, datetime.datetime.utcfromtimestamp(float(modmail.created_utc))))
-                entryCount+=1
-
-            except Exception:
-                pass
-
-            self.conn.commit()
-
-            for reply in modmail.replies:
-
-                link = "https://www.reddit.com/message/messages/%s"  % reply.id
-
-                try:
-                    self.cur.execute('''INSERT INTO MODMAIL(URL, AUTHOR, SUBJECT, BODY,DATE) VALUES(%s,%s,%s,%s,%s)''', (link, reply.author.name,reply.subject, reply.body, datetime.datetime.utcfromtimestamp(float(reply.created_utc))))
-                    entryCount+=1
-
-                except Exception:
-                    pass
-
-                self.conn.commit()
-
-        msg = self.s.send_msg('Loaded %d modmail entries into database.' % entryCount, channel_name=self.channel)
-
-    def loadBans(self, limit):
-
-        msg = self.s.send_msg('Loading bans into database...', channel_name=self.channel)
-        entryCount = 0
-
-        for banned in self.r.get_mod_log(self.subreddit, action="banuser", limit=limit):
-
-            try:
-                self.cur.execute('''INSERT INTO BANS(USERNAME, LENGTH, REASON, AUTHOR, DATE) VALUES(%s,%s,%s,%s,%s)''', (banned.target_author,banned.details, banned.description, banned.mod, datetime.datetime.utcfromtimestamp(float(banned.created_utc))))
-                entryCount+=1
-
-            except Exception:
-                pass
-
-            self.conn.commit()
-
-        msg = self.s.send_msg('Loaded %d ban entries into database.' % entryCount, channel_name=self.channel)
-
-    def refreshModmail(self, limit=15):
-
-        while self.refreshing:
-
-            try:
-
-                for modmail in self.r.get_mod_mail("explainlikeimfive", limit=limit):
-
-                    link = "https://www.reddit.com/message/messages/%s"  % modmail.id
-
-                    try:
-                        self.cur.execute('''INSERT INTO MODMAIL(URL, AUTHOR, SUBJECT, BODY,DATE) VALUES(%s,%s,%s,%s,%s)''', (link, modmail.author.name,modmail.subject, modmail.body, datetime.datetime.utcfromtimestamp(float(modmail.created_utc))))
-
-                    except Exception:
-                        pass
-
-                    self.conn.commit()
-
-                    for reply in modmail.replies:
-
-                        link = "https://www.reddit.com/message/messages/%s" % reply.id
-
-                        try:
-                            self.cur.execute('''INSERT INTO MODMAIL(URL, AUTHOR, SUBJECT, BODY,DATE) VALUES(%s,%s,%s,%s,%s)''', (link, reply.author.name,reply.subject, reply.body, datetime.datetime.utcfromtimestamp(float(reply.created_utc))))
-
-                        except Exception:
-                            pass
-
-                        self.conn.commit()
-
-            except:
-                pass
-
-            time.sleep(30)
-
-    def refreshBans(self, limit=5):
-
-        while self.refreshing:
-
-            try:
-
-                for banned in self.r.get_mod_log("explainlikeimfive", action="banuser", limit=limit):
-
-                    try:
-                        self.cur.execute('''INSERT INTO BANS(USERNAME, LENGTH, REASON, AUTHOR, DATE) VALUES(%s,%s,%s,%s,%s)''', (banned.target_author,banned.details, banned.description, banned.mod, datetime.datetime.utcfromtimestamp(float(banned.created_utc))))
-                        n = puni.Note(banned.target_author, "Banned: %s" % banned.description,banned.mod,'','ban')
-                        self.un.add_note(n)
-
-                    except Exception:
-                        pass
-
-                    self.conn.commit()
-
-            except:
-                pass
-
-            time.sleep(30)
-
-    def logPosts(self, limit=20):
+    def log_posts(self):
 
         while True:
 
             for submission in self.r.get_subreddit('explainlikeimfive').get_new(limit=20):
 
                 try:
-                    self.cur.execute('''INSERT INTO RECENTPOSTS(TITLE, DATE) VALUES(%s,%s)''', (submission.title, datetime.datetime.utcfromtimestamp(float(submission.created_utc))))
+                    self.cur.execute('''INSERT INTO RECENTPOSTS(TITLE, DATE) VALUES(%s,%s)''',
+                                     (submission.title,
+                                      datetime.datetime.utcfromtimestamp(float(submission.created_utc))))
 
                 except Exception:
                     pass
@@ -416,24 +301,18 @@ class BotMod:
 
             time.sleep(30)
 
-    def listFromDatabase(self, table):
-
-        self.cur.execute('SELECT * FROM %s' % table)
-        entryTuples = self.cur.fetchall()
-
-
     def summary(self, username):
 
-        i=0
-        totalComments = 0
-        subredditNames = []
-        subredditTotal = []
-        orderedSubredditNames = []
-        commentsInSubreddit = []
-        orderedCommentsInSubreddit = []
+        i = 0
+        total_comments = 0
+        subreddit_names = []
+        subreddit_total = []
+        ordered_subreddit_names = []
+        comments_in_subreddit = []
+        ordered_comments_in_subreddit = []
         comment_lengths = []
         history = {}
-        totalKarma = 0
+        total_karma = 0
         troll_index = 0
         troll_likelihood = "Low"
         blacklisted_subreddits = ('theredpill', 'rage', 'atheism', 'conspiracy', 'subredditdrama', 'subredditcancer',
@@ -442,7 +321,6 @@ class BotMod:
         total_negative_karma = 0
         limit = 500
         user = self.r.get_redditor(username)
-        totalKarma = 0
         x = []
         y = []
         s = []
@@ -455,12 +333,12 @@ class BotMod:
 
             displayname = comment.subreddit.display_name
 
-            if displayname not in subredditNames:
-                subredditNames.append(displayname)
+            if displayname not in subreddit_names:
+                subreddit_names.append(displayname)
 
-            subredditTotal.append(displayname)
+            subreddit_total.append(displayname)
 
-            totalKarma = totalKarma + comment.score
+            total_karma = total_karma + comment.score
 
             x.append(datetime.datetime.utcfromtimestamp(float(comment.created_utc)))
             y.append(comment.score)
@@ -477,62 +355,60 @@ class BotMod:
 
             i += 1
 
-        totalCommentsRead = i
+        total_comments_read = i
 
-        troll_index *= limit/totalCommentsRead
-
-        #comment_lengths_mean = np.mean(comment_lengths)
+        troll_index *= limit / total_comments_read
 
         average_karma = np.mean(y)
 
-        if average_karma >= 5 and total_negative_karma > (-70 * (totalCommentsRead/limit)) and troll_index < 50:
+        if average_karma >= 5 and total_negative_karma > (-70 * (total_comments_read/limit)) and troll_index < 50:
             troll_likelihood = 'Low'
 
-        if troll_index >= 40 or total_negative_karma < (-70 * (totalCommentsRead/limit)) or average_karma < 1:
+        if troll_index >= 40 or total_negative_karma < (-70 * (total_comments_read/limit)) or average_karma < 1:
             troll_likelihood = 'Moderate'
 
-        if troll_index >= 60 or total_negative_karma < (-130 * (totalCommentsRead/limit)) or average_karma < -2:
+        if troll_index >= 60 or total_negative_karma < (-130 * (total_comments_read/limit)) or average_karma < -2:
             troll_likelihood = 'High'
 
-        if troll_index >= 80 or total_negative_karma < (-180 * (totalCommentsRead / limit)) or average_karma < -5:
+        if troll_index >= 80 or total_negative_karma < (-180 * (total_comments_read / limit)) or average_karma < -5:
             troll_likelihood = 'Very high'
 
-        if troll_index >= 100 or total_negative_karma < (-200 * (totalCommentsRead / limit)) or average_karma < -10:
+        if troll_index >= 100 or total_negative_karma < (-200 * (total_comments_read / limit)) or average_karma < -10:
             troll_likelihood = 'Extremely high'
 
         print(troll_index)
         print(total_negative_karma)
 
-        for subreddit in subredditNames:
+        for subreddit in subreddit_names:
 
-            i = subredditTotal.count(subreddit)
-            commentsInSubreddit.append(i)
-            totalComments += i
+            i = subreddit_total.count(subreddit)
+            comments_in_subreddit.append(i)
+            total_comments += i
 
         i = 0
 
-        for subreddit in subredditNames:
+        for subreddit in subreddit_names:
 
-            if commentsInSubreddit[i] > (totalCommentsRead/(20*(limit/200))/(len(subredditNames)/30)):
-                history[subreddit] = commentsInSubreddit[i]
+            if comments_in_subreddit[i] > (total_comments_read/(20*(limit/200))/(len(subreddit_names)/30)):
+                history[subreddit] = comments_in_subreddit[i]
 
             i+=1
 
-        OldRange = (max(comment_lengths) - min(comment_lengths))
-        NewRange = 2000 - 50
+        old_range = (max(comment_lengths) - min(comment_lengths))
+        new_range = 2000 - 50
 
         for item in comment_lengths:
-            n = (((item - min(comment_lengths)) * NewRange) / OldRange) + 50
+            n = (((item - min(comment_lengths)) * new_range) / old_range) + 50
             s.append(n)
 
-        historyTuples = sorted(history.items(), key=lambda x: x[1])
+        history_tuples = sorted(history.items(), key=lambda x: x[1])
 
-        for each_tuple in historyTuples:
+        for each_tuple in history_tuples:
 
-            orderedSubredditNames.append(each_tuple[0])
-            orderedCommentsInSubreddit.append(each_tuple[1])
+            ordered_subreddit_names.append(each_tuple[0])
+            ordered_comments_in_subreddit.append(each_tuple[1])
 
-        user_karma_atstart = user.comment_karma - math.fabs((np.mean(y) * totalCommentsRead))
+        user_karma_atstart = user.comment_karma - math.fabs((np.mean(y) * total_comments_read))
 
         for item in list(reversed(y)):
             karma_accumulator += item
@@ -542,8 +418,8 @@ class BotMod:
             karma_accumulated_total.append(user_karma_atstart + item)
 
         plt.style.use('ggplot')
-        labels = orderedSubredditNames
-        sizes = orderedCommentsInSubreddit
+        labels = ordered_subreddit_names
+        sizes = ordered_comments_in_subreddit
         colors = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral', 'teal', 'chocolate', 'olivedrab', 'tan']
         plt.subplot(3, 1, 1)
         plt.rcParams['font.size'] = 8
@@ -556,7 +432,7 @@ class BotMod:
         x_inv = list(reversed(x))
         plt.rcParams['font.size'] = 10
         plt.scatter(x, y, c=y, vmin=-50, vmax=50, s=s, cmap='RdYlGn')
-        ax1.set_xlim(x_inv[0], x_inv[totalCommentsRead-1])
+        ax1.set_xlim(x_inv[0], x_inv[total_comments_read - 1])
         ax1.axhline(y=average_karma, xmin=0, xmax=1, c="lightskyblue", linewidth=2, zorder=4)
         plt.ylabel('Karma of comment')
 
@@ -575,7 +451,8 @@ class BotMod:
         path = os.path.dirname(os.path.realpath(__file__)) + "/" + filename
 
         link = self.imgur.upload_from_path(path, config=None, anon=True)
-        msg = self.s.send_msg("Showing summary for */u/" + username + "*. Total comments read: %d" % totalCommentsRead, channel_name=self.channel)
+        msg = self.s.send_msg("Showing summary for */u/" + username +
+                              "*. Total comments read: %d" % total_comments_read, channel_name=self.channel)
         msg = self.s.send_msg(link['link'], channel_name=self.channel)
         msg = self.s.send_msg("*Troll likelihood (experimental):* " + troll_likelihood, channel_name=self.channel)
         msg = self.s.send_msg('*User profile:* ' + "https://www.reddit.com/user/" + username, channel_name=self.channel)

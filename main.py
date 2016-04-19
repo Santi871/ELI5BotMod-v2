@@ -5,6 +5,7 @@ import threading
 import time
 from slacksocket import SlackSocket
 
+
 class myThread(threading.Thread):
     def __init__(self, threadID, name, botmod, method):
         threading.Thread.__init__(self)
@@ -35,18 +36,7 @@ def main():
 
     time.sleep(2)
 
-    listenerThread = myThread(1, "Event listener", botmod, botmod.listenToChat)
-    listenerThread.start()
-
-    time.sleep(2)
-
-    modmailThread = myThread(2, "Modmail logger", botmod, botmod.refreshModmail)
-    modmailThread.start()
-
-    time.sleep(2)
-
-    bansThread = myThread(3, "Bans logger", botmod, botmod.refreshBans)
-    bansThread.start()
+    botmod.create_thread(botmod.listen_to_chat)
 
     time.sleep(2)
 
