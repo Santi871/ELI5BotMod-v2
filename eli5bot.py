@@ -107,8 +107,7 @@ class BotMod:
 
         print("Successfully connected.")
 
-    @staticmethod
-    def create_thread(method):
+    def create_thread(self, method):
 
         thread = CreateThread(1, str(method) + " thread", method)
         thread.start()
