@@ -96,15 +96,9 @@ class BotMod:
 
         print("Connected to database")
 
-        self.start_bot()
-
-    def start_bot(self):
-
         if self.devmode:
-            #self.channel = "eli5bot-dev"
             self.subreddit = "santi871"
         else:
-            #self.channel = "general"
             self.subreddit = "explainlikeimfive"
 
         self.subreddit2 = self.r.get_subreddit(self.subreddit)
@@ -115,8 +109,9 @@ class BotMod:
     @staticmethod
     def create_thread(method):
 
-        thread = CreateThread(1, "Generic thread", method)
+        thread = CreateThread(1, str(method) + " thread", method)
         thread.start()
+        time.sleep(2)
 
     def listen_to_chat(self):
 
@@ -136,13 +131,13 @@ class BotMod:
                     found_command = content.find("!")
 
                     if found_command == 0:
-                        self.handleCommand(content, sender)
+                        self.handle_command(content, sender)
                 except:
                     pass
 
         print("Stopped listening")
 
-    def handleCommand(self, content, sender):
+    def handle_command(self, content, sender):
 
         split_content_twice = content.split(' ', 2)
         split_content = content.split()
@@ -153,7 +148,6 @@ class BotMod:
             self.command(command, split_content, split_content_twice, sender)
         except Exception as e:
             msg = self.s.send_msg('Failed to run command.\n Exception: %s' % e, channel_name=self.channel)
-
 
     def command(self, command, split_content, split_content_twice, sender):
 
