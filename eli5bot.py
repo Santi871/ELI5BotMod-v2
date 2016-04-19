@@ -112,6 +112,7 @@ class BotMod:
     @staticmethod
     def create_thread(method):
 
+        app_uri = 'https://127.0.0.1:65010/authorize_callback'
         thread_r = praw.Reddit(user_agent='windows:ELI5Mod:v3 (by /u/santi871)')
         thread_r.set_oauth_app_info(os.environ['REDDIT_APP_ID'], os.environ['REDDIT_APP_SECRET'], app_uri)
         thread_r.refresh_access_information(os.environ['REDDIT_REFRESH_TOKEN'])
