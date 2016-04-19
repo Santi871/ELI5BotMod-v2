@@ -12,6 +12,8 @@ import numpy as np
 import math
 import nltk
 
+# THIS IS THE DEV BRANCH
+
 
 class BotMod:
 
@@ -444,6 +446,7 @@ class BotMod:
         x = []
         y = []
         s = []
+
         karma_accumulator = 0
         karma_accumulated = []
         karma_accumulated_total = []
