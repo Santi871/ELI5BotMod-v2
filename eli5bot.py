@@ -17,15 +17,16 @@ import threading
 
 
 class CreateThread(threading.Thread):
-    def __init__(self, thread_id, name, method):
+    def __init__(self, thread_id, name, method, r):
         threading.Thread.__init__(self)
         self.threadID = thread_id
         self.name = name
         self.method = method
+        self.r = r
 
     def run(self):
         print("Starting " + self.name)
-        methodToRun = self.method()
+        methodToRun = self.method(self.r)
         print("Exiting " + self.name)
 
 
@@ -50,9 +51,10 @@ class BotMod:
         print("Connecting to reddit...")
 
         app_uri = 'https://127.0.0.1:65010/authorize_callback'
-        self.r = praw.Reddit(user_agent='windows:ELI5Mod:v2 (by /u/santi871)')
+        self.r = praw.Reddit(user_agent='windows:ELI5Mod:v3 (by /u/santi871)')
         self.r.set_oauth_app_info(os.environ['REDDIT_APP_ID'], os.environ['REDDIT_APP_SECRET'], app_uri)
         self.r.refresh_access_information(os.environ['REDDIT_REFRESH_TOKEN'])
+        self.r.config.api_request_delay = 1
 
         print("Connected to reddit.")
 
@@ -110,11 +112,15 @@ class BotMod:
     @staticmethod
     def create_thread(method):
 
-        thread = CreateThread(1, str(method) + " thread", method)
-        thread.start()
-        time.sleep(2)
+        thread_r = praw.Reddit(user_agent='windows:ELI5Mod:v3 (by /u/santi871)')
+        thread_r.set_oauth_app_info(os.environ['REDDIT_APP_ID'], os.environ['REDDIT_APP_SECRET'], app_uri)
+        thread_r.refresh_access_information(os.environ['REDDIT_REFRESH_TOKEN'])
+        thread_r.config.api_request_delay = 1
 
-    def listen_to_chat(self):
+        thread = CreateThread(1, str(method) + " thread", method, thread_r)
+        thread.start()
+
+    def listen_to_chat(self, r):
 
         self.listening = True
 
@@ -132,13 +138,13 @@ class BotMod:
                     found_command = content.find("!")
 
                     if found_command == 0:
-                        self.handle_command(content, sender)
+                        self.handle_command(content, sender, r)
                 except:
                     pass
 
         print("Stopped listening")
 
-    def handle_command(self, content, sender):
+    def handle_command(self, content, sender, r):
 
         split_content_twice = content.split(' ', 2)
         split_content = content.split()
@@ -146,11 +152,11 @@ class BotMod:
         command = split_content[0]
 
         try:
-            self.command(command, split_content, split_content_twice, sender)
+            self.command(command, split_content, split_content_twice, sender, r)
         except Exception as e:
             msg = self.s.send_msg('Failed to run command.\n Exception: %s' % e, channel_name=self.channel)
 
-    def command(self, command, split_content, split_content_twice, sender):
+    def command(self, command, split_content, split_content_twice, sender, r):
 
         # COMMAND LIST STARTS HERE
 
@@ -192,7 +198,7 @@ class BotMod:
             if sender in self.usergroup_mod:
 
                 if len(split_content_twice)==3:
-                    wiki_page = self.r.get_wiki_page(self.subreddit, "config/automoderator")
+                    wiki_page = r.get_wiki_page(self.subreddit, "config/automoderator")
                     wiki_page_content = wiki_page.content_md
 
                     begInd = wiki_page_content.find("shadowbans")
@@ -216,9 +222,9 @@ class BotMod:
                         newstr = wiki_page_content[:begInd] + \
                                  wiki_page_content[begInd:endInd].replace("]", replacement) + wiki_page_content[endInd:]
 
-                        self.r.edit_wiki_page(self.subreddit, "config/automoderator", newstr,
-                                              reason='ELI5_ModBot shadowban user "/u/%s" executed by "/u/%s"'
-                                                     % (username, sender))
+                        r.edit_wiki_page(self.subreddit, "config/automoderator", newstr,
+                                         reason='ELI5_ModBot shadowban user "/u/%s" executed by "/u/%s"'
+                                         % (username, sender))
 
                         msg = self.s.send_msg('Shadowbanned user: ' + "https://www.reddit.com/user/" + username,
                                               channel_name=self.channel)
@@ -254,7 +260,7 @@ class BotMod:
 
             try:
                 msg = self.s.send_msg('Generating summary, please allow a few seconds...', channel_name=self.channel)
-                self.summary(split_content[1])
+                self.summary(split_content[1], r)
 
 
             except Exception as e:
@@ -296,7 +302,7 @@ class BotMod:
 
             time.sleep(30)
 
-    def summary(self, username):
+    def summary(self, username, r):
 
         i = 0
         total_comments = 0
@@ -315,7 +321,7 @@ class BotMod:
                                   'tumblrinaction', 'offensivespeech')
         total_negative_karma = 0
         limit = 500
-        user = self.r.get_redditor(username)
+        user = r.get_redditor(username)
         x = []
         y = []
         s = []
@@ -454,14 +460,14 @@ class BotMod:
 
         plt.clf()
 
-    def repost_detector(self):
+    def repost_detector(self, r):
 
         self.already_done_reposts = []
 
         while True:
 
             try:
-                submissions = self.r.get_subreddit('explainlikeimfive').get_new(limit=5)
+                submissions = r.get_subreddit('explainlikeimfive').get_new(limit=5)
                 submissions_list = list(submissions)
                 self.search_reposts(submissions_list)
                 time.sleep(10)
@@ -529,20 +535,20 @@ class BotMod:
 
                     msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
 
-    def check_reports(self):
+    def check_reports(self, r):
 
         already_done_reports = []
 
         while True:
 
             try:
-                reported_submissions = self.r.get_reports('explainlikeimfive')
+                reported_submissions = r.get_reports('explainlikeimfive')
 
                 for submission in reported_submissions:
 
                     if submission.id not in already_done_reports:
 
-                        author_submissions = self.r.get_redditor(submission.author).get_submitted(limit=500)
+                        author_submissions = r.get_redditor(submission.author).get_submitted(limit=500)
                         removed_submissions = 0
 
                         for item in author_submissions:

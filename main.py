@@ -2,11 +2,15 @@ import sys
 import eli5bot
 import os
 import time
+import configparser
 from slacksocket import SlackSocket
 
 
 def main():
     s = SlackSocket(os.environ['SLACK_TOKEN'],translate=True)
+
+    # config = configparser.ConfigParser()
+    # config.read('config.ini')
 
     try:
         botmod = eli5bot.BotMod(s)
