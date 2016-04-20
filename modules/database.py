@@ -60,7 +60,7 @@ class Database:
             author = kwargs['author']
 
             try:
-                self.cur.execute('''INSERT INTO SHADOWBANS(USERNAME, REASON, DATE, BY) VALUES(?,?,?,?)''',
+                self.cur.execute('''INSERT INTO SHADOWBANS(USERNAME, REASON, DATE, BY) VALUES(%s,%s,%s,%s)''',
                                  (name, reason, date, author))
             finally:
                 self.conn.commit()
