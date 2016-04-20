@@ -50,9 +50,9 @@ class Database:
 
         self.conn.commit()
 
-    def insert_entry(self, type, **kwargs):\
+    def insert_entry(self, entry_type, **kwargs):\
 
-        if type == "shadowban":
+        if entry_type == "shadowban":
 
             name = kwargs['user']
             reason = kwargs['reason']
@@ -60,7 +60,7 @@ class Database:
             author = kwargs['author']
 
             try:
-                self.cur.execute('''INSERT INTO SHADOWBANS(USERNAME, REASON, DATE, BY) VALUES(%s,%s,%s,%s)''',
+                self.cur.execute('''INSERT INTO SHADOWBANS(USERNAME, REASON, DATE, BY) VALUES(?,?,?,?)''',
                                  (name, reason, date, author))
             finally:
                 self.conn.commit()
