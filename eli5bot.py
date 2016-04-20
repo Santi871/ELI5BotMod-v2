@@ -12,7 +12,6 @@ import numpy as np
 import math
 import nltk
 import threading
-from modules import database
 
 
 class CreateThread(threading.Thread):
@@ -61,6 +60,7 @@ class BotMod:
 
         if use_database:
 
+            from modules import database
             print("Connecting to database...")
             self.db = database.Database()
             print("Connected to database.")
