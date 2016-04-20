@@ -54,7 +54,7 @@ class Database:
 
         if type == "shadowban":
 
-            name = kwargs['name']
+            name = kwargs['user']
             reason = kwargs['reason']
             date = str(datetime.datetime.utcnow())
             author = kwargs['author']
