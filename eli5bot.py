@@ -37,6 +37,7 @@ class BotMod:
         print("Initializing BotMod...")
         self.s = s
         self.devmode = devmode
+        self.use_database = use_database
         self.listening = False
         self.channel = None
         self.subreddit = None
@@ -175,7 +176,9 @@ class BotMod:
                     date = str(datetime.datetime.utcnow())
 
                     try:
-                        self.db.insert_entry("shadowban", user=username, reason=reason, author=sender)
+                        if self.use_database:
+                            self.db.insert_entry("shadowban", user=username, reason=reason, author=sender)
+
                         n = puni.Note(username, "Shadowbanned, reason: %s" % reason, sender, '', 'botban')
                         self.un.add_note(n)
 
