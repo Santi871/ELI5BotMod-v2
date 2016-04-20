@@ -61,3 +61,5 @@ class Database:
 
             self.cur.execute('''INSERT INTO SHADOWBANS(USERNAME, REASON, DATE, BY) VALUES(%s,%s,%s,%s)''',
                              (name, reason, date, author))
+
+            self.conn.commit()
