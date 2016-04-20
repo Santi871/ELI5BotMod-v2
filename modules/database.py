@@ -59,7 +59,8 @@ class Database:
             date = str(datetime.datetime.utcnow())
             author = kwargs['author']
 
-            self.cur.execute('''INSERT INTO SHADOWBANS(USERNAME, REASON, DATE, BY) VALUES(%s,%s,%s,%s)''',
-                             (name, reason, date, author))
-
-            self.conn.commit()
+            try:
+                self.cur.execute('''INSERT INTO SHADOWBANS(USERNAME, REASON, DATE, BY) VALUES(%s,%s,%s,%s)''',
+                                (name, reason, date, author))
+            finally:
+                self.conn.commit()
