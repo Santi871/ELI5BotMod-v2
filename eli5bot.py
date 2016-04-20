@@ -12,8 +12,7 @@ import numpy as np
 import math
 import nltk
 import threading
-
-# THIS IS THE DEV BRANCH
+from modules import database
 
 
 class CreateThread(threading.Thread):
@@ -34,7 +33,7 @@ class BotMod:
 
     """Main class for BotMod"""
 
-    def __init__(self, s, devmode=False):
+    def __init__(self, s, devmode=False, use_database=False):
 
         print("Initializing BotMod...")
         self.s = s
@@ -60,44 +59,11 @@ class BotMod:
 
         self.imgur = ImgurClient(os.environ['IMGUR_CLIENT_ID'], os.environ['IMGUR_CLIENT_SECRET'])
 
-        print("Connecting to database...")
+        if use_database:
 
-        urllib.parse.uses_netloc.append("postgres")
-        self.url = urllib.parse.urlparse(os.environ['DATABASE_URL'])
-
-        self.conn = psycopg2.connect(
-                                database=self.url.path[1:],
-                                user=self.url.username,
-                                password=self.url.password,
-                                host=self.url.hostname,
-                                port=self.url.port
-                                )
-
-        self.cur = self.conn.cursor()
-
-        self.cur.execute(
-            "CREATE TABLE IF NOT EXISTS RECENTPOSTS"
-            "(ID SERIAL PRIMARY KEY,"
-            "TITLE TEXT UNIQUE,"
-            "DATE TEXT)")
-
-        self.cur.execute(
-            "CREATE TABLE IF NOT EXISTS MODMAIL (ID SERIAL PRIMARY KEY, URL TEXT UNIQUE, AUTHOR TEXT,"
-            " SUBJECT TEXT, BODY TEXT, DATE TEXT)")
-        self.cur.execute(
-            "CREATE TABLE IF NOT EXISTS SHADOWBANS"
-            "(ID SERIAL PRIMARY KEY,"
-            "USERNAME TEXT UNIQUE,"
-            "REASON TEXT, "
-            "DATE TEXT, "
-            "BY TEXT)")
-        self.cur.execute(
-            "CREATE TABLE IF NOT EXISTS BANS (ID SERIAL PRIMARY KEY, USERNAME TEXT UNIQUE, LENGTH TEXT,"
-            " REASON TEXT, AUTHOR TEXT, DATE TEXT)")
-
-        self.conn.commit()
-
-        print("Connected to database")
+            print("Connecting to database...")
+            self.db = database.Database()
+            print("Connected to database.")
 
         if self.devmode:
             self.subreddit = "santi871"
@@ -107,7 +73,7 @@ class BotMod:
         self.subreddit2 = self.r.get_subreddit(self.subreddit)
         self.un = puni.UserNotes(self.r, self.subreddit2)
 
-        print("Successfully connected.")
+        print("Done initializing.")
 
     @staticmethod
     def create_thread(method):
@@ -183,7 +149,7 @@ class BotMod:
             else:
                 msg = self.s.send_msg('You are not authorized to run that command.', channel_name=self.channel)
 
-        elif command =="!help":#HELP
+        elif command == "!help":  # HELP
 
             print(self.channel)
             msg = self.s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
@@ -198,20 +164,19 @@ class BotMod:
 
             if sender in self.usergroup_mod:
 
-                if len(split_content_twice)==3:
+                if len(split_content_twice) == 3:
                     wiki_page = r.get_wiki_page(self.subreddit, "config/automoderator")
                     wiki_page_content = wiki_page.content_md
 
-                    begInd = wiki_page_content.find("shadowbans")
-                    endInd = wiki_page_content.find("#end shadowbans", begInd)
+                    beg_ind = wiki_page_content.find("shadowbans")
+                    end_ind = wiki_page_content.find("#end shadowbans", beg_ind)
                     username = split_content_twice[1]
                     reason = split_content_twice[2]
                     date = str(datetime.datetime.utcnow())
 
                     try:
-                        self.cur.execute('''INSERT INTO SHADOWBANS(USERNAME, REASON, DATE, BY) VALUES(%s,%s,%s,%s)''',
-                                         (username,reason, date, sender))
-                        n = puni.Note(username,"Shadowbanned, reason: %s" % reason,sender,'','botban')
+                        self.db.insert_entry("shadowban", user=username, reason=reason, author=sender)
+                        n = puni.Note(username, "Shadowbanned, reason: %s" % reason, sender, '', 'botban')
                         self.un.add_note(n)
 
                         replacement = ', "%s"]' % username
@@ -220,8 +185,9 @@ class BotMod:
                                                                                               split_content_twice[2]),
                                               channel_name=self.channel)
 
-                        newstr = wiki_page_content[:begInd] + \
-                                 wiki_page_content[begInd:endInd].replace("]", replacement) + wiki_page_content[endInd:]
+                        newstr = wiki_page_content[:beg_ind] + \
+                                 wiki_page_content[beg_ind:end_ind].replace("]", replacement) + \
+                                 wiki_page_content[end_ind:]
 
                         r.edit_wiki_page(self.subreddit, "config/automoderator", newstr,
                                          reason='ELI5_ModBot shadowban user "/u/%s" executed by "/u/%s"'
@@ -234,27 +200,11 @@ class BotMod:
                         msg = self.s.send_msg('Failed to shadowban user.', channel_name=self.channel)
                         msg = self.s.send_msg('Exception: %s' % e, channel_name=self.channel)
 
-                    self.conn.commit()
-
                 else:
                     msg = self.s.send_msg('Usage: !shadowban [username] [reason]', channel_name=self.channel)
 
             else:
                 msg = self.s.send_msg('You are not authorized to run that command.', channel_name=self.channel)
-
-        elif split_content[0]== "!delete":  # DELETE ROWS FROM TABLE
-
-            if sender in self.usergroup_owner:
-
-                try:
-                    self.cur.execute('DELETE FROM %s' % split_content[1])
-                    self.conn.commit()
-                    msg = self.s.send_msg('Successfully deleted all entries from %s' % split_content[1],
-                                          channel_name=self.channel)
-
-                except Exception as e:
-                    msg = self.s.send_msg('Failed to delete entries.', channel_name=self.channel)
-                    msg = self.s.send_msg('Exception: %s' % e, channel_name=self.channel)
 
         elif split_content[0]== "!summary":  # SUMMARY
 
@@ -263,45 +213,22 @@ class BotMod:
                 msg = self.s.send_msg('Generating summary, please allow a few seconds...', channel_name=self.channel)
                 self.summary(split_content[1], r)
 
-
             except Exception as e:
                 msg = self.s.send_msg('Failed to generate summary.', channel_name=self.channel)
                 msg = self.s.send_msg('Exception: %s' % e, channel_name=self.channel)
 
-
-
-        #END COMMAND LIST
+        # END COMMAND LIST
 
         else:
             msg = self.s.send_msg('Command not recognized.', channel_name=self.channel)
 
     def shutdown(self):
         msg = self.s.send_msg('Shutting down...', channel_name=self.channel)
-        self.conn.close()
         sys.exit()
 
     def reboot(self):
         msg = self.s.send_msg('Rebooting...', channel_name=self.channel)
-        self.conn.close()
         self.listening = False
-
-    def log_posts(self):
-
-        while True:
-
-            for submission in self.r.get_subreddit('explainlikeimfive').get_new(limit=20):
-
-                try:
-                    self.cur.execute('''INSERT INTO RECENTPOSTS(TITLE, DATE) VALUES(%s,%s)''',
-                                     (submission.title,
-                                      datetime.datetime.utcfromtimestamp(float(submission.created_utc))))
-
-                except Exception:
-                    pass
-
-                self.conn.commit()
-
-            time.sleep(30)
 
     def summary(self, username, r):
 

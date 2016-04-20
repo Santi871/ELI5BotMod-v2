@@ -13,7 +13,7 @@ def main():
     # config.read('config.ini')
 
     try:
-        botmod = eli5bot.BotMod(s)
+        botmod = eli5bot.BotMod(s, use_database=True)
     except Exception as e:
         msg = s.send_msg('Failed to start bot.\n Exception: %s' % e, channel_name="eli5bot-dev")
         sys.exit()
