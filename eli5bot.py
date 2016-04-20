@@ -114,17 +114,16 @@ class BotMod:
 
     def handle_command(self, content, sender, r):
 
-        split_content_twice = content.split(' ', 2)
-        split_content = content.split()
-
-        command = split_content[0]
+        args = content.split()
 
         try:
-            self.command(command, split_content, split_content_twice, sender, r)
+            self.command(args, sender, r)
         except Exception as e:
             msg = self.s.send_msg('Failed to run command.\n Exception: %s' % e, channel_name=self.channel)
 
-    def command(self, command, split_content, split_content_twice, sender, r):
+    def command(self, args, sender, r):
+
+        command = args[0]
 
         # COMMAND LIST STARTS HERE
 
@@ -161,18 +160,18 @@ class BotMod:
                                   '---Made by /u/Santi871 using SlackSocket + PRAW in Python 3.5',
                                   channel_name=self.channel)
 
-        elif split_content[0]== "!shadowban":  # SHADOWBAN
+        elif command == "!shadowban":  # SHADOWBAN
 
             if sender in self.usergroup_mod:
 
-                if len(split_content_twice) == 3:
+                if len(args) == 3:
                     wiki_page = r.get_wiki_page(self.subreddit, "config/automoderator")
                     wiki_page_content = wiki_page.content_md
 
                     beg_ind = wiki_page_content.find("shadowbans")
                     end_ind = wiki_page_content.find("#end shadowbans", beg_ind)
-                    username = split_content_twice[1]
-                    reason = split_content_twice[2]
+                    username = args[1]
+                    reason = args[2:]
                     date = str(datetime.datetime.utcnow())
 
                     try:
@@ -209,12 +208,12 @@ class BotMod:
             else:
                 msg = self.s.send_msg('You are not authorized to run that command.', channel_name=self.channel)
 
-        elif split_content[0]== "!summary":  # SUMMARY
+        elif command == "!summary":  # SUMMARY
 
 
             try:
                 msg = self.s.send_msg('Generating summary, please allow a few seconds...', channel_name=self.channel)
-                self.summary(split_content[1], r)
+                self.summary(args[1], r)
 
             except Exception as e:
                 msg = self.s.send_msg('Failed to generate summary.', channel_name=self.channel)
