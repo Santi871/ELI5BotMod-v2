@@ -8,17 +8,22 @@ class Commands:
 
     def handle_command(self, r, slack_event):
 
+        print("Running command")
+
         self.r = r
         args = slack_event.get('text').split()
         command = args[0][1:]
 
         method = None
         try:
+            print("Trying to get into the command")
             method = getattr(self, command)(slack_event)
         except AttributeError:
             raise NotImplementedError("Class `{}` does not implement `{}`".format(self.__class__.__name__, command))
 
     def commands(self, slack_event):
+
+        print("Got into the command")
 
         channel = slack_event.get('channel')
 
