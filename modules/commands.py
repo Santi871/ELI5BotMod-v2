@@ -40,18 +40,22 @@ class ModOnly:
 
     def __init__(self, f):
         self.f = f
-        self.usergroup_mod = ('santi871', 'akuthia', 'mason11987', 'mike_pants', 'mjcapples', 'securethruobscure',
+        self.usergroup_mod = ('akuthia', 'mason11987', 'mike_pants', 'mjcapples', 'securethruobscure',
                               'snewzie', 'teaearlgraycold', 'thom.willard', 'yarr')
 
-    def __call__(self,):
+    def __call__(self):
 
         def wrapped_f(*args):
 
             msg_args = args[1]
+            bot = args[0]
 
             if msg_args['author'] in self.usergroup_mod:
 
                 self.f(*args)
+
+            else:
+                bot.s.send_msg('You are not authorized to run that command.', channel_name=msg_args['channel'])
 
         return wrapped_f
 
