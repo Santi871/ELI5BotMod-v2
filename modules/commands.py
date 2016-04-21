@@ -22,7 +22,7 @@ class ModOnly:
 
     def __init__(self, f):
         self.f = f
-        self.usergroup_mod = ('akuthia', 'mason11987', 'mike_pants', 'mjcapples', 'securethruobscure',
+        self.usergroup_mod = ('santi871', 'akuthia', 'mason11987', 'mike_pants', 'mjcapples', 'securethruobscure',
                               'snewzie', 'teaearlgraycold', 'thom.willard', 'yarr')
 
     def __call__(self, *args):
