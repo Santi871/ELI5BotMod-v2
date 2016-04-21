@@ -31,7 +31,7 @@ class ModOnly:
 
         print(str(args_list))
 
-        slack_event = args_list[1]
+        slack_event = args_list[0]
 
         slack_args = get_slack_event_args(slack_event)
 
