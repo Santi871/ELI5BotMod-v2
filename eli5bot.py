@@ -9,6 +9,7 @@ import nltk
 import threading
 import modules.commands as commands_module
 
+
 class CreateThread(threading.Thread):
     def __init__(self, thread_id, name, method, r):
         threading.Thread.__init__(self)
@@ -92,6 +93,9 @@ class BotMod:
                 channel = slack_event.get('channel')
 
                 args_dict = commands_module.get_slack_event_args(slack_event)
+
+                print(args[0])
+                print(args[0][1:])
 
                 try:
                     if args[0] == "!":
