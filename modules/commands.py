@@ -16,7 +16,8 @@ class Commands:
         try:
             method = getattr(self, command)(slack_event)
         except AttributeError:
-            raise NotImplementedError("Class `{}` does not implement `{}`".format(self.__class__.__name__, command))
+            self.s.send_msg('Command not recognized. Enter !commands for a list of commands',
+                            channel_name=slack_event.get('channel'))
 
     def commands(self, slack_event):
 
