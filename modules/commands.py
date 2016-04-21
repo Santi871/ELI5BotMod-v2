@@ -56,8 +56,8 @@ class ModOnly:
         return wrapped_f
 
 
-@Command
 @ModOnly
+@Command
 def commands(bot, args):
     bot.s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
                    ' usernote with reason - USERNAME IS CASE SENSITIVE!\n'
