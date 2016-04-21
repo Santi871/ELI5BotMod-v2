@@ -26,6 +26,7 @@ class Commands:
 
         self.obj = obj
         self.r = None
+        self.un = None
         self.s = s
         self.db = db
 
@@ -33,12 +34,10 @@ class Commands:
         self.usergroup_mod = ('santi871', 'akuthia', 'mason11987', 'mike_pants', 'mjcapples', 'securethruobscure',
                               'snewzie', 'teaearlgraycold', 'thom.willard', 'yarr')
 
-        self.un = puni.UserNotes(self.r, 'explainlikeimfive')
+    def handle_command(self, r, slack_event):
 
-    def assign_reddit_instance(self, r):
         self.r = r
-
-    def handle_command(self, slack_event):
+        self.un = puni.UserNotes(self.r, 'explainlikeimfive')
 
         args = get_slack_event_args(slack_event)
         command = args['content'][0][1:]

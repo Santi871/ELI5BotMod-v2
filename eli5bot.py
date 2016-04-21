@@ -89,7 +89,6 @@ class BotMod:
     def listen_to_chat(self, r):
 
         self.listening = False
-        self.command.assign_reddit_instance(r)
 
         while self.listening:
             event = self.s.get_event()
@@ -104,7 +103,7 @@ class BotMod:
                     found_command = args[0].find("!")
 
                     if found_command == 0:
-                        self.command.handle_command(slack_event)
+                        self.command.handle_command(r, slack_event)
                 except:
                     pass
 
