@@ -89,7 +89,7 @@ class BotMod:
 
             if slack_event.get('type') == 'message':
 
-                args = slack_event.get('text')
+                args = slack_event.get('text').split()
                 channel = slack_event.get('channel')
 
                 args_dict = commands_module.get_slack_event_args(slack_event)
