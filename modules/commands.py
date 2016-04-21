@@ -38,9 +38,8 @@ class Commands:
     def assign_reddit_instance(self, r):
         self.r = r
 
-    def handle_command(self, r, slack_event):
+    def handle_command(self, slack_event):
 
-        self.r = r
         args = get_slack_event_args(slack_event)
         command = args['content'][0][1:]
 

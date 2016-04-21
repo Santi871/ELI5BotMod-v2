@@ -104,7 +104,7 @@ class BotMod:
                     found_command = args[0].find("!")
 
                     if found_command == 0:
-                        self.command.handle_command(r, slack_event)
+                        self.command.handle_command(slack_event)
                 except:
                     pass
 
