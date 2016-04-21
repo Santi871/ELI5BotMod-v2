@@ -1,3 +1,12 @@
+import datetime
+import psycopg2
+import matplotlib.pyplot as plt
+import numpy as np
+import math
+import sys
+import puni
+
+
 def get_slack_event_args(slack_event):
 
     args = dict()
@@ -11,11 +20,18 @@ def get_slack_event_args(slack_event):
 
 class Commands:
 
-    def __init__(self, obj, s):
+    def __init__(self, obj, s, db=None):
 
         self.obj = obj
         self.r = None
         self.s = s
+        self.db = db
+
+        self.usergroup_owner = 'santi871'
+        self.usergroup_mod = ('santi871', 'akuthia', 'mason11987', 'mike_pants', 'mjcapples', 'securethruobscure',
+                              'snewzie', 'teaearlgraycold', 'thom.willard', 'yarr')
+
+        self.un = puni.UserNotes(self.r, 'explainlikeimfive')
 
     def handle_command(self, r, slack_event):
 
@@ -29,6 +45,10 @@ class Commands:
         except AttributeError:
             self.s.send_msg('Command not recognized. Enter !commands for a list of commands',
                             channel_name=slack_event.get('channel'))
+        except Exception as e:
+            raise e
+
+    #  ----------- DEFINE COMMANDS HERE -----------
 
     def commands(self, args):
 
@@ -40,15 +60,56 @@ class Commands:
                         '---Made by /u/Santi871 using SlackSocket + PRAW in Python 3.5',
                         channel_name=args['channel'])
 
-'''        print("Stopped listening")
+    def shadowban(self, args):
 
-    def handle_command(self, args, sender, r):
+        if args['author'] in self.usergroup_mod:
 
-        try:
-            self.command(args, sender, r)
-        except Exception as e:
-            msg = self.s.send_msg('Failed to run command.\n Exception: %s' % e, channel_name=self.channel)
+            if len(args['content']) == 3:
 
+                wiki_page = self.r.get_wiki_page('explainlikeimfive', "config/automoderator")
+                wiki_page_content = wiki_page.content_md
+
+                beg_ind = wiki_page_content.find("shadowbans")
+                end_ind = wiki_page_content.find("#end shadowbans", beg_ind)
+                username = args['content'][1]
+                reason = args['content'][2:]
+
+                try:
+                    if self.db is not None:
+                        self.db.insert_entry("shadowban", user=username, reason=reason, author=args['author'])
+
+                    n = puni.Note(username, "Shadowbanned, reason: %s" % reason, args['author'], '', 'botban')
+                    self.un.add_note(n)
+
+                    replacement = ', "%s"]' % username
+
+                    self.s.send_msg('Shadowbanning user "%s" for reason "%s"...' % (args['content'][1],
+                                                                                    args['content'][2:]),
+                                    channel_name=args['channel'])
+
+                    newstr = wiki_page_content[:beg_ind] + \
+                             wiki_page_content[beg_ind:end_ind].replace("]", replacement) + \
+                             wiki_page_content[end_ind:]
+
+                    self.r.edit_wiki_page('explainlikeimfive', "config/automoderator", newstr,
+                                          reason='ELI5_ModBot shadowban user "/u/%s" executed by "/u/%s"'
+                                          % (username, args['author']))
+
+                    self.s.send_msg('Shadowbanned user: ' + "https://www.reddit.com/user/" + username,
+                                    channel_name=args['channel'])
+
+                except Exception as e:
+                    self.s.send_msg('Failed to shadowban user.', channel_name=args['channel'])
+                    self.s.send_msg('Exception: %s' % e, channel_name=args['channel'])
+
+            else:
+                self.s.send_msg('Usage: !shadowban [username] [reason]', channel_name=args['channel'])
+
+        else:
+            self.s.send_msg('You are not authorized to run that command.', channel_name=args['channel'])
+
+
+'''
     def command(self, args, sender, r):
 
         command = args[0]

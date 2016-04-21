@@ -1,5 +1,4 @@
 import praw
-import sys
 import os
 import puni
 import datetime
@@ -7,9 +6,6 @@ import urllib.parse
 import psycopg2
 import time
 from imgurpython import ImgurClient
-import matplotlib.pyplot as plt
-import numpy as np
-import math
 import nltk
 import threading
 
@@ -43,9 +39,6 @@ class BotMod:
         self.subreddit = None
         self.refreshing = True
         self.already_done_reposts = []
-        self.usergroup_owner = ['santi871']
-        self.usergroup_mod = ['santi871', 'akuthia', 'mason11987', 'mike_pants', 'mjcapples', 'securethruobscure',
-                              'snewzie', 'teaearlgraycold', 'thom.willard', 'yarr']
 
         print("Connecting to reddit...")
 
@@ -69,7 +62,7 @@ class BotMod:
         if use_commands:
 
             from modules import commands
-            self.command = commands.Commands(self, self.s)
+            self.command = commands.Commands(self, self.s, self.db)
 
         if self.devmode:
             self.subreddit = "santi871"
