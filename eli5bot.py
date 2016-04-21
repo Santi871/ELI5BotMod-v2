@@ -88,7 +88,8 @@ class BotMod:
 
     def listen_to_chat(self, r):
 
-        self.listening = True
+        self.listening = False
+        self.command.assign_reddit_instance(r)
 
         while self.listening:
             event = self.s.get_event()

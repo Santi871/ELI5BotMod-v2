@@ -33,6 +33,9 @@ class Commands:
 
         self.un = puni.UserNotes(self.r, 'explainlikeimfive')
 
+    def assign_reddit_instance(self, r):
+        self.r = r
+
     def handle_command(self, r, slack_event):
 
         self.r = r
