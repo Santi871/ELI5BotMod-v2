@@ -59,7 +59,8 @@ class BotMod:
         if use_commands:
 
             from modules import commands
-            self.command = commands.CommandsHandler(self, self.s, self.db)
+            self.command_handler = commands.CommandsHandler(self, self.s, self.db)
+            self.create_thread(self.listen_to_chat)
 
         if self.devmode:
             self.subreddit = "santi871"
@@ -98,7 +99,7 @@ class BotMod:
 
                 try:
                     if args[0] == "!":
-                        self.command.handle_command(r, slack_event)
+                        self.command_handler.handle_command(r, slack_event)
                 except Exception as e:
                     self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel)
 

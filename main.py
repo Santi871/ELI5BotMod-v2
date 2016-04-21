@@ -20,7 +20,6 @@ def main():
 
     time.sleep(2)
 
-    botmod.create_thread(botmod.listen_to_chat)
     botmod.create_thread(botmod.repost_detector)
     botmod.create_thread(botmod.check_reports)
 
