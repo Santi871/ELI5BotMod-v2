@@ -88,7 +88,7 @@ class BotMod:
 
     def listen_to_chat(self, r):
 
-        self.listening = False
+        self.listening = True
 
         while self.listening:
             event = self.s.get_event()
@@ -96,13 +96,10 @@ class BotMod:
 
             if slack_event.get('type') == 'message':
 
-                args = slack_event.get('text').split()
-                # self.channel = slack_event.get('channel')
+                args = slack_event.get('text')
 
                 try:
-                    found_command = args[0].find("!")
-
-                    if found_command == 0:
+                    if args[0] == "!":
                         self.command.handle_command(r, slack_event)
                 except:
                     pass
