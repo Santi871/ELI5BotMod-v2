@@ -57,6 +57,8 @@ class BotMod:
             self.db = database.Database()
             print("Connected to database.")
 
+        self.create_thread(self.listen_to_chat)
+
         if self.devmode:
             self.subreddit = "santi871"
         else:
