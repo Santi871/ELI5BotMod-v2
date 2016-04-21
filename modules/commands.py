@@ -18,6 +18,26 @@ def get_slack_event_args(slack_event):
     return args
 
 
+class ModOnly:
+
+    def __init__(self, f):
+        self.f = f
+        self.usergroup_mod = ('akuthia', 'mason11987', 'mike_pants', 'mjcapples', 'securethruobscure',
+                              'snewzie', 'teaearlgraycold', 'thom.willard', 'yarr')
+
+    def __call__(self, *args):
+
+        args_list = list(args)
+
+        slack_event = args_list[1]
+
+        slack_args = get_slack_event_args(slack_event)
+
+        if slack_args['author'] in self.usergroup_mod:
+
+            self.f(*args)
+
+
 class CommandsHandler:
 
     """This class handles commands, you can define new commands here"""
@@ -30,7 +50,7 @@ class CommandsHandler:
         self.s = s
         self.db = db
 
-        self.usergroup_owner = 'santi871'
+        self.owner = 'santi871'
         self.usergroup_mod = ('santi871', 'akuthia', 'mason11987', 'mike_pants', 'mjcapples', 'securethruobscure',
                               'snewzie', 'teaearlgraycold', 'thom.willard', 'yarr')
 
@@ -63,6 +83,7 @@ class CommandsHandler:
                         '---Made by /u/Santi871 using SlackSocket + PRAW in Python 3.5',
                         channel_name=args['channel'])
 
+    @ModOnly
     def shadowban(self, args):
 
         if args['author'] in self.usergroup_mod:
