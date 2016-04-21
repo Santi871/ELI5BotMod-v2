@@ -18,9 +18,9 @@ def get_slack_event_args(slack_event):
     return args
 
 
-class Commands:
+class CommandsHandler:
 
-    """Main class for commands, define new commands here"""
+    """This class handles commands, you can define new commands here"""
 
     def __init__(self, obj, s, db=None):
 

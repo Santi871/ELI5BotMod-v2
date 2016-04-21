@@ -59,7 +59,7 @@ class BotMod:
         if use_commands:
 
             from modules import commands
-            self.command = commands.Commands(self, self.s, self.db)
+            self.command = commands.CommandsHandler(self, self.s, self.db)
 
         if self.devmode:
             self.subreddit = "santi871"
