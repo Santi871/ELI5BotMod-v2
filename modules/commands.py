@@ -60,8 +60,6 @@ class CommandsHandler:
         self.s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
                         ' usernote with reason - USERNAME IS CASE SENSITIVE!\n'
                         '!summary [user]: generates a summary of [user]\n'
-                        '!shutdown: exit the bot script\n'
-                        '!reboot: reboot the bot script\n'
                         '---Made by /u/Santi871 using SlackSocket + PRAW in Python 3.5',
                         channel_name=args['channel'])
 
