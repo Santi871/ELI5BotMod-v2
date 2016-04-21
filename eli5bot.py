@@ -5,7 +5,6 @@ import datetime
 import urllib.parse
 import psycopg2
 import time
-from imgurpython import ImgurClient
 import nltk
 import threading
 
@@ -49,8 +48,6 @@ class BotMod:
         self.r.config.api_request_delay = 1
 
         print("Connected to reddit.")
-
-        self.imgur = ImgurClient(os.environ['IMGUR_CLIENT_ID'], os.environ['IMGUR_CLIENT_SECRET'])
 
         if use_database:
 
