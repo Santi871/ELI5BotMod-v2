@@ -20,6 +20,8 @@ def get_slack_event_args(slack_event):
 
 class Commands:
 
+    """Main class for commands, define new commands here"""
+
     def __init__(self, obj, s, db=None):
 
         self.obj = obj
