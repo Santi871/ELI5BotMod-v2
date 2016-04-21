@@ -1,9 +1,7 @@
 import datetime
-import psycopg2
 import matplotlib.pyplot as plt
 import numpy as np
 import math
-import sys
 from imgurpython import ImgurClient
 import puni
 import os
