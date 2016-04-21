@@ -36,7 +36,28 @@ class Command:
         return wrapped_f
 
 
+class ModOnly:
+
+    def __init__(self, f):
+        self.f = f
+        self.usergroup_mod = ('santi871', 'akuthia', 'mason11987', 'mike_pants', 'mjcapples', 'securethruobscure',
+                              'snewzie', 'teaearlgraycold', 'thom.willard', 'yarr')
+
+    def __call__(self,):
+
+        def wrapped_f(*args):
+
+            msg_args = args[1]
+
+            if msg_args['author'] in self.usergroup_mod:
+
+                self.f(*args)
+
+        return wrapped_f
+
+
 @Command
+@ModOnly
 def commands(bot, args):
     bot.s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
                    ' usernote with reason - USERNAME IS CASE SENSITIVE!\n'
