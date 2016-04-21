@@ -18,6 +18,35 @@ def get_slack_event_args(slack_event):
     return args
 
 
+class Command:
+
+    commands = {}
+
+    def __init__(self, f):
+
+        self.f = f
+        self.func_name = f.__name__
+
+        self.commands[self.func_name] = f
+
+    def __call__(self):
+        def wrapped_f(*args):
+            self.f(*args)
+
+        return wrapped_f
+
+
+@Command
+def commands(bot, args):
+    bot.s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
+                   ' usernote with reason - USERNAME IS CASE SENSITIVE!\n'
+                   '!summary [user]: generates a summary of [user]\n'
+                   '---Made by /u/Santi871 using SlackSocket + PRAW in Python 3.5',
+                   channel_name=args['channel'])
+
+'''
+
+
 class ModOnly:
 
     def __init__(self, f):
@@ -296,3 +325,4 @@ class CommandsHandler:
                               channel_name=args['channel'])
 
         plt.clf()
+'''
