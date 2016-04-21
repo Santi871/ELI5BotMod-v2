@@ -98,7 +98,7 @@ class BotMod:
                 print(args[0][1:])
 
                 try:
-                    if args[0] == "!":
+                    if args[0][:1] == "!":
                         commands_module.Command.commands_dict[args[0][1:]](self, args_dict)
                 except Exception as e:
                     self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel)
