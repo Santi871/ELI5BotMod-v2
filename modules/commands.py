@@ -69,7 +69,7 @@ class Commands:
 
         if args['author'] in self.usergroup_mod:
 
-            if len(args['content']) == 3:
+            if len(args['content']) >= 3:
 
                 self.s.send_msg('Shadowbanning user "%s" for reason "%s"...' % (args['content'][1],
                                                                                 ' '.join(args['content'][2:])),
@@ -114,6 +114,9 @@ class Commands:
             self.s.send_msg('You are not authorized to run that command.', channel_name=args['channel'])
 
     def summary(self, args):
+
+        msg = self.s.send_msg('Generating summary, please allow a few seconds...', channel_name=args['channel'])
+
         i = 0
         total_comments = 0
         subreddit_names = []
