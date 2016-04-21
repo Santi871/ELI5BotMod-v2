@@ -20,14 +20,14 @@ def get_slack_event_args(slack_event):
 
 class Command:
 
-    commands = {}
+    commands_dict = {}
 
     def __init__(self, f):
 
         self.f = f
         self.func_name = f.__name__
 
-        self.commands[self.func_name] = f
+        self.commands_dict[self.func_name] = f
 
     def __call__(self):
         def wrapped_f(*args):
