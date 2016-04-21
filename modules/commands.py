@@ -20,19 +20,17 @@ class Commands:
     def handle_command(self, r, slack_event):
 
         self.r = r
-        args = slack_event.get('text').split()
-        command = args[0][1:]
+        args = get_slack_event_args(slack_event)
+        command = args['content'][0][1:]
 
         method = None
         try:
-            method = getattr(self, command)(slack_event)
+            method = getattr(self, command)(args)
         except AttributeError:
             self.s.send_msg('Command not recognized. Enter !commands for a list of commands',
                             channel_name=slack_event.get('channel'))
 
-    def commands(self, slack_event):
-
-        args = get_slack_event_args(slack_event)
+    def commands(self, args):
 
         self.s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
                         ' usernote with reason - USERNAME IS CASE SENSITIVE!\n'
