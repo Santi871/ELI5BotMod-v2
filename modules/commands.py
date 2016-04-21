@@ -1,3 +1,14 @@
+def get_slack_event_args(slack_event):
+
+    args = dict()
+
+    args['channel'] = slack_event.get('channel')
+    args['content'] = slack_event.get('text').split()
+    args['author'] = slack_event.get('user')
+
+    return args
+
+
 class Commands:
 
     def __init__(self, obj, s):
@@ -21,7 +32,7 @@ class Commands:
 
     def commands(self, slack_event):
 
-        channel = slack_event.get('channel')
+        args = get_slack_event_args(slack_event)
 
         self.s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
                         ' usernote with reason - USERNAME IS CASE SENSITIVE!\n'
@@ -29,7 +40,7 @@ class Commands:
                         '!shutdown: exit the bot script\n'
                         '!reboot: reboot the bot script\n'
                         '---Made by /u/Santi871 using SlackSocket + PRAW in Python 3.5',
-                        channel_name=channel)
+                        channel_name=args['channel'])
 
 '''        print("Stopped listening")
 
