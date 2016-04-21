@@ -45,8 +45,6 @@ class Commands:
         except AttributeError:
             self.s.send_msg('Command not recognized. Enter !commands for a list of commands',
                             channel_name=slack_event.get('channel'))
-        except Exception as e:
-            raise e
 
     #  ----------- DEFINE COMMANDS HERE -----------
 
