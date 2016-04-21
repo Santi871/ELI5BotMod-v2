@@ -69,6 +69,10 @@ class Commands:
 
             if len(args['content']) == 3:
 
+                self.s.send_msg('Shadowbanning user "%s" for reason "%s"...' % (args['content'][1],
+                                                                                args['content'][2:]),
+                                channel_name=args['channel'])
+
                 wiki_page = self.r.get_wiki_page('explainlikeimfive', "config/automoderator")
                 wiki_page_content = wiki_page.content_md
 
@@ -85,10 +89,6 @@ class Commands:
                     self.un.add_note(n)
 
                     replacement = ', "%s"]' % username
-
-                    self.s.send_msg('Shadowbanning user "%s" for reason "%s"...' % (args['content'][1],
-                                                                                    args['content'][2:]),
-                                    channel_name=args['channel'])
 
                     newstr = wiki_page_content[:beg_ind] + \
                              wiki_page_content[beg_ind:end_ind].replace("]", replacement) + \
