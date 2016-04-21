@@ -29,11 +29,17 @@ class ModOnly:
 
         args_list = list(args)
 
+        print(str(args_list))
+
         slack_event = args_list[1]
 
         slack_args = get_slack_event_args(slack_event)
 
+        print(str(slack_args))
+
         if slack_args['author'] in self.usergroup_mod:
+
+            print("Running func")
 
             self.f(*args)
 
