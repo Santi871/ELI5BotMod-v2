@@ -38,8 +38,9 @@ class CommandsHandler:
 
     #  ----------- DEFINE COMMANDS HERE -----------
 
-    @staticmethod
-    def commands(*args):
+    def commands(self, *args):
+
+        db = self.sb
         s = args[1]
 
         s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
