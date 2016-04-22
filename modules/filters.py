@@ -56,6 +56,9 @@ class Filters:
 
             broken_event = title
 
+            print(str(title))
+            print(str(title_words_list))
+
             got_intersection = set(title) & set(title_words_list)
 
             if got_intersection:
