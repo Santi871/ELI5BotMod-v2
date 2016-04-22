@@ -95,16 +95,18 @@ class BotMod:
 
             if slack_event.get('type') == 'message':
 
-                args = slack_event.get('text').split()
-                channel = slack_event.get('channel')
-                command = args[0][1:]
-                args_dict = self.commands_module.get_slack_event_args(slack_event)
+                if slack_event.get('text') is not None:
+                    args = slack_event.get('text').split()
 
-                try:
-                    if args[0][0] == "!":
-                        getattr(self.command_handler, command)(r, args_dict)
-                except Exception as e:
-                    self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel)
+                    channel = slack_event.get('channel')
+                    command = args[0][1:]
+                    args_dict = self.commands_module.get_slack_event_args(slack_event)
+
+                    try:
+                        if args[0][0] == "!":
+                            getattr(self.command_handler, command)(r, args_dict)
+                    except Exception as e:
+                        self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel)
 
     def repost_detector(self, r):
 
