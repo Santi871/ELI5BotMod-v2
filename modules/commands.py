@@ -42,10 +42,9 @@ class CommandsHandler:
 
     def generate_commands_dict(self):
 
-        for name, f in self.__dict__.items():
-            print(name)
-            if callable(f):
-                self.commands_dict[name] = f
+        for method in dir(self):
+            if callable(getattr(self, method)):
+                self.commands_dict[method.__name__] = method
 
     def handle_command(self, r, slack_event):
 
