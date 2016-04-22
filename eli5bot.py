@@ -27,7 +27,7 @@ class BotMod:
 
     """Main class for BotMod"""
 
-    def __init__(self, s, devmode=False, use_database=False, use_commands=True):
+    def __init__(self, s, devmode=False, use_database=False, use_commands=True, search_reposts=True):
 
         print("Initializing BotMod...")
         self.s = s
@@ -62,6 +62,12 @@ class BotMod:
             self.commands_module = commands_module
             self.command_handler = self.commands_module.CommandsHandler(self, self.s, self.db)
             self.create_thread(self.listen_to_chat)
+
+        if search_reposts:
+
+            from modules import repost_detector
+            self.repost_detector_obj = repost_detector.RepostDetector(self.r, self.s)
+            self.create_thread(self.scan_new_posts)
 
         if self.devmode:
             self.subreddit = "santi871"
@@ -108,80 +114,17 @@ class BotMod:
                     except Exception as e:
                         self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel)
 
-    def repost_detector(self, r):
-
-        self.already_done_reposts = []
+    def scan_new_posts(self):
 
         while True:
 
             try:
-                submissions = r.get_subreddit('explainlikeimfive').get_new(limit=5)
-                submissions_list = list(submissions)
-                self.search_reposts(submissions_list)
+                submissions = self.r.get_subreddit('explainlikeimfive').get_new(limit=5)
+                self.repost_detector_obj.search_reposts(submissions)
                 time.sleep(10)
 
             except Exception:
                 time.sleep(2)
-
-    def search_reposts(self, submissions):
-
-        tags = ('NN', 'NNP', 'NNPS', 'JJ', 'NNS', 'VBG', 'VB', 'VBN', 'CD', 'VBP', 'RB', 'VBD')
-
-        nltk.data.path.append('./nltk_data/')
-
-        for submission in submissions:
-
-            if submission.id not in self.already_done_reposts:
-
-                words_list = []
-                total_in_threehours = 0
-                title = submission.title
-                self.already_done_reposts.append(submission.id)
-
-                tokens = nltk.word_tokenize(title)
-                tagged = nltk.pos_tag(tokens)
-
-                for word, tag in tagged:
-
-                    if tag in tags:
-                        words_list.append(word)
-
-                search_query = ' '.join(words_list)
-                full_search_query = "title:(" + search_query + ")"
-
-                search_result = self.r.search(full_search_query, subreddit="explainlikeimfive", sort='new')
-                search_result_list = list(search_result)
-
-                for item in search_result_list:
-
-                    comment_time = datetime.datetime.fromtimestamp(item.created_utc)
-                    d = datetime.datetime.now() - comment_time
-                    delta_time = d.total_seconds()
-
-                    if int(delta_time / 60) < 180:
-                        total_in_threehours += 1
-
-                if len(search_result_list) >= 3:
-
-                    msg_string = "---\n*Potential repost detected*\n" + \
-                                 title + '\n' + "*POS tagger output:* " + str(tagged) + '\n' + \
-                                 '*Link:* ' + submission.permalink + '\n' + "*Search query:* " + full_search_query + \
-                                 '\n' + '*Search results:*\n'
-
-                    for item in search_result_list:
-                        msg_string += str(item) + '\n'
-
-                    msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
-
-                    submission.report("Potential repost")
-
-                if total_in_threehours >= 3:
-
-                    msg_string = "---\n*Potential large influx of question*\n" + \
-                                 title + '\n' + "*Search query:* " + full_search_query + '\n' + '*Link:* ' + \
-                                 submission.permalink
-
-                    msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
 
     def check_reports(self, r):
 
