@@ -40,10 +40,7 @@ class CommandsHandler:
 
     def commands(self, *args):
 
-        db = self.db
-        s = args[1]
-
-        s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
+        self.s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
                        ' usernote with reason - USERNAME IS CASE SENSITIVE!\n'
                        '!summary [user]: generates a summary of [user]\n'
                        '---Made by /u/Santi871 using SlackSocket + PRAW in Python 3.5',
