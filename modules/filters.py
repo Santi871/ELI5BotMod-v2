@@ -27,7 +27,7 @@ class Filters:
             words_list = []
 
             tokens = nltk.word_tokenize(submission.title)
-            tagged = nltk.pos_tag(tokens)
+            tagged = nltk.pos_tag(tokens[1:])
 
             for word, tag in tagged:
 
@@ -90,7 +90,7 @@ class Filters:
                 self.already_done.append(submission.id)
 
                 tokens = nltk.word_tokenize(title)
-                tagged = nltk.pos_tag(tokens)
+                tagged = nltk.pos_tag(tokens[1:])
 
                 for word, tag in tagged:
 

@@ -64,12 +64,7 @@ class BotMod:
             self.command_handler = self.commands_module.CommandsHandler(self, self.s, self.db)
             self.create_thread(self.listen_to_chat)
 
-        if search_reposts:
-
-            from modules import repost_detector
-            self.repost_detector_obj = repost_detector.RepostDetector(self.r, self.s)
-            self.create_thread(self.scan_new_posts)
-
+        self.create_thread(self.scan_new_posts)
         self.filters = filters.Filters(self.r, self.s)
 
         if self.devmode:
@@ -121,14 +116,10 @@ class BotMod:
 
         while True:
 
-            try:
-                submissions = r.get_subreddit('santi871').get_new(limit=5)
-                self.filters.search_reposts(submissions)
-                self.filters.check_current_events(submissions)
-                time.sleep(10)
-
-            except Exception:
-                time.sleep(2)
+            submissions = r.get_subreddit('santi871').get_new(limit=5)
+            self.filters.search_reposts(submissions)
+            self.filters.check_current_events(submissions)
+            time.sleep(10)
 
     def check_reports(self, r):
 
