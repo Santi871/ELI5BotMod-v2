@@ -45,7 +45,8 @@ class Filters:
 
         title_keywords_list = intersect(list_of_words_lists[0], list_of_words_lists[1], list_of_words_lists[2])
 
-        self.s.send_msg("Created cur event rule: %s" % ' '.join(title_keywords_list), channel_name="eli5bot-dev")
+        self.s.send_msg("Created cur event rule: %s" % ' '.join(title_keywords_list), channel_name="eli5bot-dev",
+                        confirm=False)
 
     def _get_broken_cur_event(self, title_words_list):
 
@@ -88,7 +89,7 @@ class Filters:
 
                 if broken_event is not None:
                     submission.report("Broken event: %s" % broken_event)
-                    self.s.send_msg("Broken event: %s" % broken_event, channel_name="eli5bot-dev")
+                    self.s.send_msg("Broken event: %s" % broken_event, channel_name="eli5bot-dev", confirm=False)
 
                 self.already_checked_cur_events.append(submission.id)
 
