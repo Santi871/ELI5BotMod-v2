@@ -73,6 +73,8 @@ class Filters:
 
     def check_current_events(self, submissions):
 
+        passed = True
+
         for submission in submissions:
 
             if submission.id not in self.already_checked_cur_events:
@@ -86,8 +88,11 @@ class Filters:
                 if broken_event is not None:
                     submission.report("Broken event: %s" % broken_event)
                     self.s.send_msg("Broken event: %s" % broken_event, channel_name="eli5bot-dev")
+                    passed = False
 
                 self.already_checked_cur_events.append(submission.id)
+
+        return passed
 
     def search_reposts(self, submissions):
 
