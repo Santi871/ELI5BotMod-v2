@@ -43,6 +43,7 @@ class CommandsHandler:
     def generate_commands_dict(self):
 
         for name, f in self.__dict__.items():
+            print(name)
             if callable(f):
                 self.commands_dict[name] = f
 
