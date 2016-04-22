@@ -49,6 +49,7 @@ class Filters:
 
     def _get_broken_cur_event(self, title_words_list):
 
+        print(str(self.current_events))
         broken_event = None
 
         for title in self.current_events:
