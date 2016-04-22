@@ -15,6 +15,7 @@ class Filters:
         self.r = r
         self.s = s
         self.already_done = []
+        self.already_checked_cur_events = []
         self.tags = ('NN', 'NNP', 'NNPS', 'JJ', 'NNS', 'VBG', 'VB', 'VBN', 'CD', 'VBP', 'RB', 'VBD')
         self.current_events = []
 
@@ -72,18 +73,11 @@ class Filters:
 
     def check_current_events(self, submissions):
 
-        print("1")
-
-        already_checked = []
-
         for submission in submissions:
 
-            print("2")
-
-            if submission.id not in already_checked:
+            if submission.id not in self.already_checked_cur_events:
                 title_words_list = nltk.word_tokenize(submission.title)
 
-                print("3")
                 print(submission.id)
                 print(str(title_words_list))
 
@@ -93,7 +87,7 @@ class Filters:
                     submission.report("Broken event: %s" % broken_event)
                     self.s.send_msg("Broken event: %s" % broken_event, channel_name="eli5bot-dev")
 
-                already_checked.append(submission.id)
+                self.already_checked_cur_events.append(submission.id)
 
     def search_reposts(self, submissions):
 

@@ -118,6 +118,7 @@ class BotMod:
 
             submissions = r.get_subreddit('santi871').get_new(limit=1)
             self.filters.check_current_events(submissions)
+            time.sleep(1)
             self.filters.search_reposts(submissions)
             time.sleep(10)
 
