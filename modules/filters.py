@@ -74,6 +74,8 @@ class Filters:
 
     def check_current_events(self, submissions):
 
+        print("Got called")
+
         for submission in submissions:
 
             if submission.id not in self.already_checked_cur_events:
