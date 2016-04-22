@@ -40,7 +40,7 @@ class CommandsHandler:
 
     def commands(self, *args):
 
-        db = self.sb
+        db = self.db
         s = args[1]
 
         s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
