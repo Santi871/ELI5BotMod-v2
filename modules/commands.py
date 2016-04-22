@@ -44,7 +44,7 @@ class CommandsHandler:
 
         for method in dir(self):
             if callable(getattr(self, method)):
-                self.commands_dict[method] = getattr(self, method)
+                self.commands_dict[method] = method
 
     def handle_command(self, r, slack_event):
 
@@ -65,18 +65,19 @@ class CommandsHandler:
 
     #  ----------- DEFINE COMMANDS HERE -----------
 
-    def commands(self, *args):
+    def commands(self, args):
+
+        bot = self.obj
 
         print("Got in")
 
-        s = args[1]
         args = args[2]
 
-        s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
-                   ' usernote with reason - USERNAME IS CASE SENSITIVE!\n'
-                   '!summary [user]: generates a summary of [user]\n'
-                   '---Made by /u/Santi871 using SlackSocket + PRAW in Python 3.5',
-                   channel_name=args['channel'])
+        bot.s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
+                       ' usernote with reason - USERNAME IS CASE SENSITIVE!\n'
+                       '!summary [user]: generates a summary of [user]\n'
+                       '---Made by /u/Santi871 using SlackSocket + PRAW in Python 3.5',
+                       channel_name=args['channel'])
 
     def shadowban(self, args):
 
