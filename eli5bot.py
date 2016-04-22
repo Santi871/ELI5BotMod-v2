@@ -114,12 +114,12 @@ class BotMod:
                     except Exception as e:
                         self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel)
 
-    def scan_new_posts(self):
+    def scan_new_posts(self, r):
 
         while True:
 
             try:
-                submissions = self.r.get_subreddit('explainlikeimfive').get_new(limit=5)
+                submissions = r.get_subreddit('explainlikeimfive').get_new(limit=5)
                 self.repost_detector_obj.search_reposts(submissions)
                 time.sleep(10)
 
