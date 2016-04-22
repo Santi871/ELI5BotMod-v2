@@ -44,7 +44,7 @@ class CommandsHandler:
 
         for method in dir(self):
             if callable(getattr(self, method)):
-                self.commands_dict[method.__name__] = method
+                self.commands_dict[method] = getattr(self, method)
 
     def handle_command(self, r, slack_event):
 
