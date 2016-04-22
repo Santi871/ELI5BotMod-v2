@@ -45,6 +45,8 @@ class Filters:
 
         title_keywords_list = intersect(list_of_words_lists[0], list_of_words_lists[1], list_of_words_lists[2])
 
+        self.current_events.append(title_keywords_list)
+
         self.s.send_msg("Created cur event rule: %s" % ' '.join(title_keywords_list), channel_name="eli5bot-dev",
                         confirm=False)
 
