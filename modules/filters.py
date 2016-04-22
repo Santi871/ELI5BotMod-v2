@@ -10,6 +10,8 @@ class Filters:
 
     """This module implements a set of filters through which submissions can be ran through"""
 
+    current_events = []
+
     def __init__(self, r, s):
 
         self.r = r
@@ -17,7 +19,6 @@ class Filters:
         self.already_done = []
         self.already_checked_cur_events = []
         self.tags = ('NN', 'NNP', 'NNPS', 'JJ', 'NNS', 'VBG', 'VB', 'VBN', 'CD', 'VBP', 'RB', 'VBD')
-        self.current_events = []
 
     def _create_c_events_rule(self, search_results):
 
