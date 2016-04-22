@@ -65,8 +65,7 @@ class CommandsHandler:
 
     #  ----------- DEFINE COMMANDS HERE -----------
 
-    @staticmethod
-    def commands(*args):
+    def commands(self, *args):
 
         s = args[1]
         args = args[2]
