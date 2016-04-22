@@ -27,7 +27,10 @@ class Filters:
             words_list = []
 
             tokens = nltk.word_tokenize(submission.title)
-            tagged = nltk.pos_tag(tokens[2:])
+            tokens.remove("ELI5")
+            tokens.remove(":")
+            tokens.remove(";")
+            tagged = nltk.pos_tag(tokens)
 
             for word, tag in tagged:
 
@@ -40,28 +43,33 @@ class Filters:
 
         self.current_events.append(title_keywords_list)
 
+        self.s.send_msg("Created cur event rule: %s" % ' '.join(title_keywords_list), channel_name="eli5bot-dev")
+
     def _get_broken_cur_event(self, title_words_list):
 
         broken_event = None
 
         for title in self.current_events:
 
-            broken_event = self.current_events
+            broken_event = title
 
             got_intersection = set(title) & set(title_words_list)
 
             if got_intersection:
                 break
 
-        return broken_event
+        return ' '.join(broken_event)
 
     def check_current_events(self, submissions):
 
         for submission in submissions:
             title_words_list = nltk.word_tokenize(submission.title)
-            del title_words_list[0]
 
-            self._get_broken_cur_event(title_words_list)
+            broken_event = self._get_broken_cur_event(title_words_list)
+
+            if broken_event:
+                submission.report("Broken event: %s" % broken_event)
+                self.s.send_msg("Broken event: %s" % broken_event, channel_name="eli5bot-dev")
 
     def search_reposts(self, submissions):
 
@@ -77,7 +85,10 @@ class Filters:
                 self.already_done.append(submission.id)
 
                 tokens = nltk.word_tokenize(title)
-                tagged = nltk.pos_tag(tokens[2:])
+                tokens.remove("ELI5")
+                tokens.remove(":")
+                tokens.remove(";")
+                tagged = nltk.pos_tag(tokens)
 
                 for word, tag in tagged:
 

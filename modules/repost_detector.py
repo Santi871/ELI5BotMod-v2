@@ -26,7 +26,10 @@ class RepostDetector:
                 self.already_done_reposts.append(submission.id)
 
                 tokens = nltk.word_tokenize(title)
-                tagged = nltk.pos_tag(tokens[2:])
+                tokens.remove("ELI5")
+                tokens.remove(":")
+                tokens.remove(";")
+                tagged = nltk.pos_tag(tokens)
 
                 for word, tag in tagged:
 
