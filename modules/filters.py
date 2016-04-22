@@ -3,6 +3,7 @@ import datetime
 
 
 def intersect(a, b, c):
+    print("H " + str(list(set(a) & set(b) & set(c))))
     return list(set(a) & set(b) & set(c))
 
 
