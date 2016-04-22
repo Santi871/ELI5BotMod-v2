@@ -197,11 +197,11 @@ class CommandsHandler:
 
             i += 1
 
-        old_range = (max(comment_lengths) - min(comment_lengths))
+        old_range = 700 - 50
         new_range = 2000 - 50
 
         for item in comment_lengths:
-            n = (((item - min(comment_lengths)) * new_range) / old_range) + 50
+            n = (((item - 50) * new_range) / old_range) + 50
             s.append(n)
 
         history_tuples = sorted(history.items(), key=lambda x: x[1])
