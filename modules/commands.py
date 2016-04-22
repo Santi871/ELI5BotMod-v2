@@ -22,8 +22,6 @@ class CommandsHandler:
 
     """This class handles commands, you can define new commands here"""
 
-    commands_dict = {}
-
     def __init__(self, obj, s, db=None):
 
         self.obj = obj
@@ -38,40 +36,10 @@ class CommandsHandler:
 
         self.imgur = ImgurClient(os.environ['IMGUR_CLIENT_ID'], os.environ['IMGUR_CLIENT_SECRET'])
 
-        self.generate_commands_dict()
-
-    def generate_commands_dict(self):
-
-        for method in dir(self):
-            if callable(getattr(self, method)):
-                self.commands_dict[method] = method
-
-    def handle_command(self, r, slack_event):
-
-        self.r = r
-        self.un = puni.UserNotes(self.r, 'explainlikeimfive')
-
-        args = get_slack_event_args(slack_event)
-        command = args['content'][0][1:]
-
-        method = None
-        try:
-            method = getattr(self, command)(args)
-        except AttributeError:
-            self.s.send_msg('Command not recognized. Enter !commands for a list of commands',
-                            channel_name=slack_event.get('channel'))
-        except TypeError as e:
-            print(e)
-
     #  ----------- DEFINE COMMANDS HERE -----------
 
     def commands(self, args):
-
         bot = self.obj
-
-        print("Got in")
-
-        args = args[2]
 
         bot.s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
                        ' usernote with reason - USERNAME IS CASE SENSITIVE!\n'
