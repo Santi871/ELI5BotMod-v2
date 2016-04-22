@@ -63,7 +63,12 @@ class Filters:
             if got_intersection:
                 break
 
-        return ' '.join(broken_event)
+        if broken_event is not None:
+            ret = ' '.join(broken_event)
+        else:
+            ret = None
+
+        return ret
 
     def check_current_events(self, submissions):
 
@@ -84,7 +89,7 @@ class Filters:
 
                 broken_event = self._get_broken_cur_event(title_words_list)
 
-                if broken_event:
+                if broken_event is not None:
                     submission.report("Broken event: %s" % broken_event)
                     self.s.send_msg("Broken event: %s" % broken_event, channel_name="eli5bot-dev")
 
@@ -126,8 +131,7 @@ class Filters:
 
                     if int(delta_time / 60) < 180:
                         total_in_threehours += 1
-
-                    search_results_in_last_threehours.append(item)
+                        search_results_in_last_threehours.append(item)
 
                 if len(search_result_list) >= 4:
 
