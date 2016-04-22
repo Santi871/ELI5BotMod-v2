@@ -103,7 +103,7 @@ class BotMod:
                 print(str(self.command_handler.commands_dict))
 
                 try:
-                    if args[0] == "!":
+                    if args[0][0] == "!":
                         # self.command_handler.handle_command(r, slack_event)
                         self.command_handler.commands_dict[command](r, self.s, args_dict)
                 except Exception as e:
