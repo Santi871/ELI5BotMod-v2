@@ -22,21 +22,25 @@ class Filters:
 
         list_of_words_lists = []
 
-        for submission in search_results:
+        print(str(search_results))
 
-            words_list = []
+        for index, submission in enumerate(search_results):
 
-            tokens = nltk.word_tokenize(submission.title)
-            tagged = nltk.pos_tag(tokens[1:])
+            if index <= 3:
 
-            for word, tag in tagged:
+                words_list = []
 
-                if tag in self.tags:
-                    words_list.append(word)
+                tokens = nltk.word_tokenize(submission.title)
+                tagged = nltk.pos_tag(tokens[1:])
 
-            list_of_words_lists.append(words_list)
+                for word, tag in tagged:
 
-            submission.remove()
+                    if tag in self.tags:
+                        words_list.append(word)
+
+                list_of_words_lists.append(words_list)
+
+                submission.remove()
 
         title_keywords_list = intersect(list_of_words_lists[0], list_of_words_lists[1], list_of_words_lists[2])
 
@@ -133,4 +137,4 @@ class Filters:
 
                     msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
 
-                    self._create_c_events_rule(search_result_list[:2])
+                    self._create_c_events_rule(search_result_list)
