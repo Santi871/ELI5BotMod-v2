@@ -18,86 +18,6 @@ def get_slack_event_args(slack_event):
     return args
 
 
-class Command:
-
-    commands_dict = {}
-
-    def __init__(self, f):
-
-        self.f = f
-        self.func_name = f.__name__
-
-        self.commands_dict[self.func_name] = f
-
-    def __call__(self):
-        def wrapped_f(*args):
-            self.f(*args)
-
-        return wrapped_f
-
-
-class ModOnly:
-
-    def __init__(self, f):
-        self.f = f
-        self.usergroup_mod = ('akuthia', 'mason11987', 'mike_pants', 'mjcapples', 'securethruobscure',
-                              'snewzie', 'teaearlgraycold', 'thom.willard', 'yarr')
-
-    def __call__(self):
-
-        def wrapped_f(*args):
-
-            msg_args = args[1]
-            bot = args[0]
-
-            if msg_args['author'] in self.usergroup_mod:
-
-                self.f(*args)
-
-            else:
-                bot.s.send_msg('You are not authorized to run that command.', channel_name=msg_args['channel'])
-
-        return wrapped_f
-
-
-@ModOnly
-@Command
-def commands(bot, args):
-    bot.s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
-                   ' usernote with reason - USERNAME IS CASE SENSITIVE!\n'
-                   '!summary [user]: generates a summary of [user]\n'
-                   '---Made by /u/Santi871 using SlackSocket + PRAW in Python 3.5',
-                   channel_name=args['channel'])
-
-'''
-
-
-class ModOnly:
-
-    def __init__(self, f):
-        self.f = f
-        self.usergroup_mod = ('santi871', 'akuthia', 'mason11987', 'mike_pants', 'mjcapples', 'securethruobscure',
-                              'snewzie', 'teaearlgraycold', 'thom.willard', 'yarr')
-
-    def __call__(self, *args):
-
-        args_list = list(args)
-
-        print(str(args_list))
-
-        slack_event = args_list[0]
-
-        slack_args = get_slack_event_args(slack_event)
-
-        print(str(slack_args))
-
-        if slack_args['author'] in self.usergroup_mod:
-
-            print("Running func")
-
-            self.f(*args)
-
-
 class CommandsHandler:
 
     """This class handles commands, you can define new commands here"""
@@ -110,40 +30,24 @@ class CommandsHandler:
         self.s = s
         self.db = db
 
-        self.owner = 'santi871'
+        self.usergroup_owner = 'santi871'
         self.usergroup_mod = ('santi871', 'akuthia', 'mason11987', 'mike_pants', 'mjcapples', 'securethruobscure',
                               'snewzie', 'teaearlgraycold', 'thom.willard', 'yarr')
 
         self.imgur = ImgurClient(os.environ['IMGUR_CLIENT_ID'], os.environ['IMGUR_CLIENT_SECRET'])
 
-    def handle_command(self, r, slack_event):
-
-        self.r = r
-        self.un = puni.UserNotes(self.r, 'explainlikeimfive')
-
-        args = get_slack_event_args(slack_event)
-        command = args['content'][0][1:]
-
-        method = None
-        try:
-            print(getattr(self, command)(args))
-        except AttributeError:
-            self.s.send_msg('Command not recognized. Enter !commands for a list of commands',
-                            channel_name=slack_event.get('channel'))
-        except TypeError as e:
-            print(e)
-
     #  ----------- DEFINE COMMANDS HERE -----------
 
-    def commands(self, args):
+    def commands(self, *args):
+
+        event_args = args[1]
 
         self.s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
-                        ' usernote with reason - USERNAME IS CASE SENSITIVE!\n'
-                        '!summary [user]: generates a summary of [user]\n'
-                        '---Made by /u/Santi871 using SlackSocket + PRAW in Python 3.5',
-                        channel_name=args['channel'])
+                       ' usernote with reason - USERNAME IS CASE SENSITIVE!\n'
+                       '!summary [user]: generates a summary of [user]\n'
+                       '---Made by /u/Santi871 using SlackSocket + PRAW in Python 3.5',
+                       channel_name=event_args['channel'])
 
-    @ModOnly
     def shadowban(self, args):
 
         if args['author'] in self.usergroup_mod:
@@ -350,4 +254,3 @@ class CommandsHandler:
                               channel_name=args['channel'])
 
         plt.clf()
-'''

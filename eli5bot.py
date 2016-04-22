@@ -7,7 +7,6 @@ import psycopg2
 import time
 import nltk
 import threading
-import modules.commands as commands_module
 
 
 class CreateThread(threading.Thread):
@@ -57,7 +56,12 @@ class BotMod:
             self.db = database.Database()
             print("Connected to database.")
 
-        self.create_thread(self.listen_to_chat)
+        if use_commands:
+
+            from modules import commands as commands_module
+            self.commands_module = commands_module
+            self.command_handler = commands_module.CommandsHandler(self, self.s, self.db)
+            self.create_thread(self.listen_to_chat)
 
         if self.devmode:
             self.subreddit = "santi871"
@@ -93,15 +97,13 @@ class BotMod:
 
                 args = slack_event.get('text').split()
                 channel = slack_event.get('channel')
-
-                args_dict = commands_module.get_slack_event_args(slack_event)
-
-                print(args[0])
-                print(args[0][1:])
+                command = args[0][1:]
+                args_dict = self.commands_module.get_slack_event_args(slack_event)
 
                 try:
-                    if args[0][:1] == "!":
-                        commands_module.Command.commands_dict[args[0][1:]](self, args_dict)
+                    if args[0][0] == "!":
+                        # self.command_handler.handle_command(r, slack_event)
+                        getattr(self.command_handler, command)(r, args_dict)
                 except Exception as e:
                     self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel)
 
