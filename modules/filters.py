@@ -45,26 +45,20 @@ class Filters:
 
         title_keywords_list = intersect(list_of_words_lists[0], list_of_words_lists[1], list_of_words_lists[2])
 
-        print(str(title_keywords_list))
-        self.current_events.append(title_keywords_list)
-        print(str(self.current_events))
-
         self.s.send_msg("Created cur event rule: %s" % ' '.join(title_keywords_list), channel_name="eli5bot-dev")
 
     def _get_broken_cur_event(self, title_words_list):
 
-        print(str(self.current_events))
+        print("Got in")
         broken_event = None
 
         for title in self.current_events:
 
             broken_event = title
 
-            print(str(title))
-            print(str(title_words_list))
-            print(str(self.current_events))
-
+            print("Checking " + str(title_words_list))
             got_intersection = set(title) & set(title_words_list)
+            print(str(got_intersection))
 
             if got_intersection:
                 break
@@ -73,6 +67,8 @@ class Filters:
             ret = ' '.join(broken_event)
         else:
             ret = None
+
+        print("ret " + str(ret))
 
         return ret
 
