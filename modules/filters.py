@@ -50,8 +50,9 @@ class Filters:
 
     def _get_broken_cur_event(self, title_words_list):
 
-        print("Got in")
+        print("1")
         broken_event = None
+        print(str(self.current_events))
 
         for title in self.current_events:
 
@@ -74,8 +75,6 @@ class Filters:
         return ret
 
     def check_current_events(self, submissions):
-
-        print("Got called")
 
         for submission in submissions:
 
