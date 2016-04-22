@@ -39,6 +39,8 @@ class Filters:
 
             list_of_words_lists.append(words_list)
 
+            submission.remove()
+
         title_keywords_list = intersect(list_of_words_lists[0], list_of_words_lists[1], list_of_words_lists[2])
 
         self.current_events.append(title_keywords_list)
@@ -62,14 +64,20 @@ class Filters:
 
     def check_current_events(self, submissions):
 
+        already_checked = []
+
         for submission in submissions:
-            title_words_list = nltk.word_tokenize(submission.title)
 
-            broken_event = self._get_broken_cur_event(title_words_list)
+            if submission.id not in already_checked:
+                title_words_list = nltk.word_tokenize(submission.title)
 
-            if broken_event:
-                submission.report("Broken event: %s" % broken_event)
-                self.s.send_msg("Broken event: %s" % broken_event, channel_name="eli5bot-dev")
+                broken_event = self._get_broken_cur_event(title_words_list)
+
+                if broken_event:
+                    submission.report("Broken event: %s" % broken_event)
+                    self.s.send_msg("Broken event: %s" % broken_event, channel_name="eli5bot-dev")
+
+                already_checked.append(submission.id)
 
     def search_reposts(self, submissions):
 
@@ -98,7 +106,7 @@ class Filters:
                 search_query = ' '.join(words_list)
                 full_search_query = "title:(" + search_query + ")"
 
-                search_result = self.r.search(full_search_query, subreddit="explainlikeimfive", sort='new')
+                search_result = self.r.search(full_search_query, subreddit="santi871", sort='new')
                 search_result_list = list(search_result)
 
                 for item in search_result_list:

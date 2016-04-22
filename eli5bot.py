@@ -7,6 +7,7 @@ import psycopg2
 import time
 import nltk
 import threading
+from modules import filters
 
 
 class CreateThread(threading.Thread):
@@ -69,6 +70,8 @@ class BotMod:
             self.repost_detector_obj = repost_detector.RepostDetector(self.r, self.s)
             self.create_thread(self.scan_new_posts)
 
+        self.filters = filters.Filters(self.r, self.s)
+
         if self.devmode:
             self.subreddit = "santi871"
         else:
@@ -119,8 +122,9 @@ class BotMod:
         while True:
 
             try:
-                submissions = r.get_subreddit('explainlikeimfive').get_new(limit=5)
+                submissions = r.get_subreddit('santi871').get_new(limit=5)
                 self.repost_detector_obj.search_reposts(submissions)
+                self.filters.check_current_events(submissions)
                 time.sleep(10)
 
             except Exception:
