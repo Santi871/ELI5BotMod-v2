@@ -64,8 +64,8 @@ class BotMod:
             self.command_handler = self.commands_module.CommandsHandler(self, self.s, self.db)
             self.create_thread(self.listen_to_chat)
 
-        self.create_thread(self.scan_new_posts)
         self.filters = filters.Filters(self.r, self.s)
+        self.create_thread(self.scan_new_posts)
 
         if self.devmode:
             self.subreddit = "santi871"

@@ -22,8 +22,6 @@ class Filters:
 
         list_of_words_lists = []
 
-        print(str(search_results))
-
         for index, submission in enumerate(search_results):
 
             if index <= 3:
