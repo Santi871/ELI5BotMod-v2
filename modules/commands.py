@@ -66,10 +66,10 @@ class CommandsHandler:
     #  ----------- DEFINE COMMANDS HERE -----------
 
     @staticmethod
-    def commands(**kwargs):
+    def commands(*args):
 
-        s = kwargs['s']
-        args = kwargs['args']
+        s = args[1]
+        args = args[2]
 
         s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
                    ' usernote with reason - USERNAME IS CASE SENSITIVE!\n'
