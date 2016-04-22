@@ -67,6 +67,8 @@ class CommandsHandler:
 
     def commands(self, *args):
 
+        print("Got in")
+
         s = args[1]
         args = args[2]
 
