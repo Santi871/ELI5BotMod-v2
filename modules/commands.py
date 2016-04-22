@@ -38,10 +38,11 @@ class CommandsHandler:
 
     #  ----------- DEFINE COMMANDS HERE -----------
 
-    def commands(self, args):
-        bot = self.obj
+    @staticmethod
+    def commands(*args):
+        s = args[1]
 
-        bot.s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
+        s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
                        ' usernote with reason - USERNAME IS CASE SENSITIVE!\n'
                        '!summary [user]: generates a summary of [user]\n'
                        '---Made by /u/Santi871 using SlackSocket + PRAW in Python 3.5',
