@@ -27,9 +27,6 @@ class Filters:
             words_list = []
 
             tokens = nltk.word_tokenize(submission.title)
-            tokens.remove("ELI5")
-            tokens.remove(":")
-            tokens.remove(";")
             tagged = nltk.pos_tag(tokens)
 
             for word, tag in tagged:
@@ -93,9 +90,6 @@ class Filters:
                 self.already_done.append(submission.id)
 
                 tokens = nltk.word_tokenize(title)
-                tokens.remove("ELI5")
-                tokens.remove(":")
-                tokens.remove(";")
                 tagged = nltk.pos_tag(tokens)
 
                 for word, tag in tagged:
