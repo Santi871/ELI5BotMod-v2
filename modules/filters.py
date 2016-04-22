@@ -96,6 +96,7 @@ class Filters:
             if submission.id not in self.already_done:
 
                 words_list = []
+                search_results_in_last_threehours = []
                 total_in_threehours = 0
                 title = submission.title
                 self.already_done.append(submission.id)
@@ -123,6 +124,8 @@ class Filters:
                     if int(delta_time / 60) < 180:
                         total_in_threehours += 1
 
+                    search_results_in_last_threehours.append(item)
+
                 if len(search_result_list) >= 4:
 
                     msg_string = "---\n*Potential repost detected*\n" + \
@@ -144,4 +147,4 @@ class Filters:
 
                     msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
 
-                    self._create_c_events_rule(search_result_list)
+                    self._create_c_events_rule(search_results_in_last_threehours)
