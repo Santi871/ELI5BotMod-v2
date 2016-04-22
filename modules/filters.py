@@ -58,6 +58,7 @@ class Filters:
 
             print(str(title))
             print(str(title_words_list))
+            print(str(self.current_events))
 
             got_intersection = set(title) & set(title_words_list)
 
@@ -74,6 +75,9 @@ class Filters:
 
             if submission.id not in already_checked:
                 title_words_list = nltk.word_tokenize(submission.title)
+
+                print(submission.id)
+                print(str(title_words_list))
 
                 broken_event = self._get_broken_cur_event(title_words_list)
 
