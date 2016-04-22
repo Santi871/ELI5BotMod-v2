@@ -117,8 +117,8 @@ class BotMod:
         while True:
 
             submissions = r.get_subreddit('santi871').get_new(limit=1)
-            self.filters.search_reposts(submissions)
             self.filters.check_current_events(submissions)
+            self.filters.search_reposts(submissions)
             time.sleep(10)
 
     def check_reports(self, r):
