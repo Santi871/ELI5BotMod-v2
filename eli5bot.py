@@ -60,7 +60,7 @@ class BotMod:
 
             from modules import commands as commands_module
             self.commands_module = commands_module
-            self.command_handler = commands_module.CommandsHandler(self, self.s, self.db)
+            self.command_handler = self.commands_module.CommandsHandler(self, self.s, self.db)
             self.create_thread(self.listen_to_chat)
 
         if self.devmode:
@@ -102,7 +102,6 @@ class BotMod:
 
                 try:
                     if args[0][0] == "!":
-                        # self.command_handler.handle_command(r, slack_event)
                         getattr(self.command_handler, command)(r, args_dict)
                 except Exception as e:
                     self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel)
