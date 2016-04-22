@@ -40,7 +40,7 @@ class Filters:
 
                 list_of_words_lists.append(words_list)
 
-                submission.remove()
+            submission.remove()
 
         title_keywords_list = intersect(list_of_words_lists[0], list_of_words_lists[1], list_of_words_lists[2])
 
@@ -69,13 +69,18 @@ class Filters:
 
     def check_current_events(self, submissions):
 
+        print("1")
+
         already_checked = []
 
         for submission in submissions:
 
+            print("2")
+
             if submission.id not in already_checked:
                 title_words_list = nltk.word_tokenize(submission.title)
 
+                print("3")
                 print(submission.id)
                 print(str(title_words_list))
 
