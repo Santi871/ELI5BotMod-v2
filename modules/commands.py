@@ -22,6 +22,8 @@ class CommandsHandler:
 
     """This class handles commands, you can define new commands here"""
 
+    commands_dict = {}
+
     def __init__(self, obj, s, db=None):
 
         self.obj = obj
@@ -35,6 +37,14 @@ class CommandsHandler:
                               'snewzie', 'teaearlgraycold', 'thom.willard', 'yarr')
 
         self.imgur = ImgurClient(os.environ['IMGUR_CLIENT_ID'], os.environ['IMGUR_CLIENT_SECRET'])
+
+        self.generate_commands_dict()
+
+    def generate_commands_dict(self):
+
+        for name, f in self.__dict__.items():
+            if callable(f):
+                self.commands_dict[name] = f
 
     def handle_command(self, r, slack_event):
 
@@ -55,13 +65,14 @@ class CommandsHandler:
 
     #  ----------- DEFINE COMMANDS HERE -----------
 
-    def commands(self, args):
+    @staticmethod
+    def commands(s, args):
 
-        self.s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
-                        ' usernote with reason - USERNAME IS CASE SENSITIVE!\n'
-                        '!summary [user]: generates a summary of [user]\n'
-                        '---Made by /u/Santi871 using SlackSocket + PRAW in Python 3.5',
-                        channel_name=args['channel'])
+        s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
+                   ' usernote with reason - USERNAME IS CASE SENSITIVE!\n'
+                   '!summary [user]: generates a summary of [user]\n'
+                   '---Made by /u/Santi871 using SlackSocket + PRAW in Python 3.5',
+                   channel_name=args['channel'])
 
     def shadowban(self, args):
 
