@@ -22,16 +22,14 @@ class Filters:
         self.r = r
         self.s = s
         self.db = db
-        self.already_done = []
+        self.already_done_reposts = []
         self.already_checked_cur_events = []
         self.tags = ('NN', 'NNP', 'NNPS', 'JJ', 'NNS', 'VBG', 'VB', 'VBN', 'CD', 'RB', 'VBD')
         self.filters = []
 
         for name, f in Filters.__dict__.items():
-            if name[0] != "_" and callable(f):
+            if callable(f) and name[0] != "_" and name != "run_filters":
                 self.filters.append(name)
-
-        print(str(self.filters))
 
     # -------------- DEFINE INTERNAL METHODS NEEDED BY THE FILTERS HERE --------------
 
@@ -102,6 +100,12 @@ class Filters:
 
         return ret
 
+    def run_filters(self, submission):
+
+        for filter_method in self.filters:
+
+            getattr(self, filter_method)(submission)
+
     # -------------- DEFINE FILTERS HERE --------------
 
     def check_current_events(self, submission):
@@ -121,13 +125,13 @@ class Filters:
 
         nltk.data.path.append('./nltk_data/')
 
-        if submission.id not in self.already_done:
+        if submission.id not in self.already_done_reposts:
 
             words_list = []
             search_results_in_last_threehours = []
             total_in_threehours = 0
             title = submission.title.lower()
-            self.already_done.append(submission.id)
+            self.already_done_reposts.append(submission.id)
 
             tokens = nltk.word_tokenize(title)
 

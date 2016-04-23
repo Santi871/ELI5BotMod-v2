@@ -121,7 +121,7 @@ class CommandsHandler:
         troll_likelihood = "Low"
         blacklisted_subreddits = ('theredpill', 'rage', 'atheism', 'conspiracy', 'subredditdrama', 'subredditcancer',
                                   'SRSsucks', 'drama', 'undelete', 'blackout2015', 'oppression0', 'kotakuinaction',
-                                  'tumblrinaction', 'offensivespeech')
+                                  'tumblrinaction', 'offensivespeech', 'bixnood')
         total_negative_karma = 0
         limit = 500
         user = r.get_redditor(slack_args['content'][1])
@@ -262,3 +262,15 @@ class CommandsHandler:
                               channel_name=slack_args['channel'])
 
         plt.clf()
+
+    def addrule(self, *args):
+
+        slack_args = args[1]
+
+        self.db.insert_entry('recent_event', event_keywords=slack_args['content'][1:])
+
+        msg = self.s.send_msg('*Will now filter submissions containing:* ' + slack_args['content'][1:],
+                              channel_name=slack_args['channel'])
+
+
+

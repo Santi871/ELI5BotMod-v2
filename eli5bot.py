@@ -115,9 +115,7 @@ class BotMod:
     def scan_new_posts(self, r):
 
         for submission in praw.helpers.submission_stream(r, 'santi871', limit=50, verbosity=0):
-
-            self.filters.check_current_events(submission)
-            self.filters.search_reposts(submission)
+            self.filters.run_filters(submission)
 
     def check_reports(self, r):
 
