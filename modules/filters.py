@@ -1,5 +1,6 @@
 import nltk
 import datetime
+import time
 
 
 def intersect(titles):
@@ -129,6 +130,7 @@ class Filters:
 
             words_list = []
             search_results_in_last_threehours = []
+            search_result_list = []
             total_in_threehours = 0
             title = submission.title.lower()
             self.already_done_reposts.append(submission.id)
@@ -160,38 +162,47 @@ class Filters:
             search_query = ' '.join(words_list)
             full_search_query = "title:(" + search_query + ")"
 
-            search_result = self.r.search(full_search_query, subreddit="santi871", sort='new')
-            search_result_list = list(search_result)
+            while True:
 
-            for item in search_result_list:
+                try:
+                    search_result = self.r.search(full_search_query, subreddit="santi871", sort='new')
+                    search_result_list = list(search_result)
+                    break
+                except AssertionError:
+                    time.sleep(1)
+                    continue
 
-                comment_time = datetime.datetime.fromtimestamp(item.created_utc)
-                d = datetime.datetime.now() - comment_time
-                delta_time = d.total_seconds()
-
-                if int(delta_time / 60) < 180:
-                    total_in_threehours += 1
-                    search_results_in_last_threehours.append(item)
-
-            if len(search_result_list) >= 4:
-
-                msg_string = "---\n*Potential repost detected*\n" + \
-                             title + '\n' + "*POS tagger output:* " + str(tagged) + '\n' + \
-                             '*Link:* ' + submission.permalink + '\n' + "*Search query:* " + full_search_query + \
-                             '\n' + '*Search results:*\n'
+            if search_result_list:
 
                 for item in search_result_list:
-                    msg_string += str(item) + '\n'
 
-                msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
+                    comment_time = datetime.datetime.fromtimestamp(item.created_utc)
+                    d = datetime.datetime.now() - comment_time
+                    delta_time = d.total_seconds()
 
-                submission.report("Potential repost")
+                    if int(delta_time / 60) < 180:
+                        total_in_threehours += 1
+                        search_results_in_last_threehours.append(item)
 
-            if total_in_threehours >= 3:
-                msg_string = "---\n*Potential large influx of question*\n" + \
-                             title + '\n' + "*Search query:* " + full_search_query + '\n' + '*Link:* ' + \
-                             submission.permalink
+                if len(search_result_list) >= 4:
 
-                msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
+                    msg_string = "---\n*Potential repost detected*\n" + \
+                                 title + '\n' + "*POS tagger output:* " + str(tagged) + '\n' + \
+                                 '*Link:* ' + submission.permalink + '\n' + "*Search query:* " + full_search_query + \
+                                 '\n' + '*Search results:*\n'
 
-                self._create_c_events_rule(search_results_in_last_threehours)
+                    for item in search_result_list:
+                        msg_string += str(item) + '\n'
+
+                    msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
+
+                    submission.report("Potential repost")
+
+                if total_in_threehours >= 3:
+                    msg_string = "---\n*Potential large influx of question*\n" + \
+                                 title + '\n' + "*Search query:* " + full_search_query + '\n' + '*Link:* ' + \
+                                 submission.permalink
+
+                    msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
+
+                    self._create_c_events_rule(search_results_in_last_threehours)
