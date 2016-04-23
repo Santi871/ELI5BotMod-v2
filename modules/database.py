@@ -48,6 +48,11 @@ class Database:
             "CREATE TABLE IF NOT EXISTS BANS (ID SERIAL PRIMARY KEY, USERNAME TEXT UNIQUE, LENGTH TEXT,"
             " REASON TEXT, AUTHOR TEXT, DATE TEXT)")
 
+        self.cur.execute(
+            "CREATE TABLE IF NOT EXISTS CURRENT_EVENTS"
+            "(ID SERIAL PRIMARY KEY,"
+            "EVENT_KEYWORDS TEXT)")
+
         self.conn.commit()
 
     def insert_entry(self, entry_type, **kwargs):\
@@ -64,3 +69,27 @@ class Database:
                                  (name, reason, date, author))
             finally:
                 self.conn.commit()
+
+        if entry_type == 'recent_event':
+
+            event_keywords = kwargs['event_keywords']
+            event_keywords_string = ' '.join(event_keywords)
+
+            try:
+                self.cur.execute('''INSERT INTO CURRENT_EVENTS(EVENT_KEYWORDS) VALUES(%s)''', event_keywords_string)
+            finally:
+                self.conn.commit()
+
+    def retrieve_entries(self, entry_type):
+
+        if entry_type == 'current_events':
+
+            self.cur.execute('''SELECT EVENT_KEYWORDS FROM CURRENT_EVENTS''')
+            all_events_list = self.cur.fetchall()
+
+            for index, event in enumerate(all_events_list):
+                all_events_list[index] = event.split()
+
+            return all_events_list
+
+

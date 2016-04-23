@@ -19,10 +19,11 @@ class Filters:
 
     current_events = []
 
-    def __init__(self, r, s):
+    def __init__(self, r, s, db):
 
         self.r = r
         self.s = s
+        self.db = db
         self.already_done = []
         self.already_checked_cur_events = []
         self.tags = ('NN', 'NNP', 'NNPS', 'JJ', 'NNS', 'VBG', 'VB', 'VBN', 'CD', 'RB', 'VBD')
@@ -66,9 +67,9 @@ class Filters:
         except ValueError:
             pass
 
-        self.current_events.append(final_words_list)
+        self.db.insert_entry('recent_event', event_keywords=final_words_list)
 
-        self.s.send_msg("*Created current event rule, posts containing:* %s" % ' '.join(final_words_list),
+        self.s.send_msg("*Created current event rule, posts containing:* '%s'" % ' '.join(final_words_list),
                         channel_name="eli5bot-dev",
                         confirm=False)
 
@@ -76,7 +77,10 @@ class Filters:
 
         broken_event = None
         submission_title = ' '.join(title_words_list)
-        for event in self.current_events:
+
+        current_events = self.db.retrieve_entries('current_events')
+
+        for event in current_events:
 
             broken_event = event
 

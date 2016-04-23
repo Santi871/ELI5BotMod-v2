@@ -64,7 +64,7 @@ class BotMod:
             self.command_handler = self.commands_module.CommandsHandler(self, self.s, self.db)
             self.create_thread(self.listen_to_chat)
 
-        self.filters = filters.Filters(self.r, self.s)
+        self.filters = filters.Filters(self.r, self.s, self.db)
         self.create_thread(self.scan_new_posts)
 
         if self.devmode:
