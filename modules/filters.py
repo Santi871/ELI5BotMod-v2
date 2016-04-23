@@ -27,6 +27,8 @@ class Filters:
         self.already_checked_cur_events = []
         self.tags = ('NN', 'NNP', 'NNPS', 'JJ', 'NNS', 'VBG', 'VB', 'VBN', 'CD', 'RB', 'VBD')
 
+    # -------------- DEFINE INTERNAL METHODS NEEDED BY THE FILTERS HERE --------------
+
     def _create_c_events_rule(self, search_results):
 
         list_of_tokenized_titles = []
@@ -88,7 +90,7 @@ class Filters:
 
         return ret
 
-    # -------------- DEFINE NEW FILTERS HERE --------------
+    # -------------- DEFINE FILTERS HERE --------------
 
     def check_current_events(self, submissions):
 
