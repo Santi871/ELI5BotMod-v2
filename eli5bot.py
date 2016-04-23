@@ -114,14 +114,10 @@ class BotMod:
 
     def scan_new_posts(self, r):
 
-        while True:
+        for submission in praw.helpers.submission_stream(r, 'explainlikeimfive', limit=50, verbosity=0):
 
-            submissions = r.get_subreddit('santi871').get_new(limit=1)
-            submissions_list = list(submissions)
-            self.filters.check_current_events(submissions_list)
-            time.sleep(1)
-            self.filters.search_reposts(submissions_list)
-            time.sleep(10)
+            self.filters.check_current_events(submission)
+            self.filters.search_reposts(submission)
 
     def check_reports(self, r):
 
