@@ -28,7 +28,7 @@ class Filters:
         self.filters = []
 
         for name, f in self.__dict__.items():
-            if name[0] != "_" and callable(f):
+            if callable(f):
                 self.filters.append = name
 
         print(str(self.filters))
@@ -130,7 +130,11 @@ class Filters:
             self.already_done.append(submission.id)
 
             tokens = nltk.word_tokenize(title)
-            tokens.remove('eli5')
+
+            try:
+                tokens.remove('eli5')
+            except ValueError:
+                pass
 
             try:
                 tokens.remove(':')
