@@ -27,8 +27,8 @@ class Filters:
         self.tags = ('NN', 'NNP', 'NNPS', 'JJ', 'NNS', 'VBG', 'VB', 'VBN', 'CD', 'RB', 'VBD')
         self.filters = []
 
-        for name, f in self.__dict__.items():
-            if callable(f):
+        for name, f in Filters.__dict__.items():
+            if name[0] != "_" and callable(f):
                 self.filters.append = name
 
         print(str(self.filters))
