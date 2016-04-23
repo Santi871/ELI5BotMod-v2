@@ -88,7 +88,8 @@ class Database:
             all_events_list = self.cur.fetchall()
 
             for index, event in enumerate(all_events_list):
-                all_events_list[index] = event.split()
+                print(str(event))
+                all_events_list[index] = event[1].split()
 
             return all_events_list
 
