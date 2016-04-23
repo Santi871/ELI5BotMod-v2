@@ -54,6 +54,16 @@ class Filters:
 
         final_words_list.remove('eli5')
 
+        try:
+            final_words_list.remove(':')
+        except ValueError:
+            pass
+
+        try:
+            final_words_list.remove(';')
+        except ValueError:
+            pass
+
         self.current_events.append(final_words_list)
 
         self.s.send_msg("Created cur event rule: %s" % ' '.join(final_words_list), channel_name="eli5bot-dev",
@@ -61,17 +71,12 @@ class Filters:
 
     def _get_broken_cur_event(self, title_words_list):
 
-        print("1")
         broken_event = None
-        print(str(self.current_events))
-
         for title in self.current_events:
 
             broken_event = title
 
-            print("Checking " + str(title_words_list))
             got_intersection = set(title) & set(title_words_list)
-            print(str(got_intersection))
 
             if got_intersection:
                 break
@@ -81,8 +86,6 @@ class Filters:
         else:
             ret = None
 
-        print("ret " + str(ret))
-
         return ret
 
     def check_current_events(self, submissions):
@@ -91,9 +94,6 @@ class Filters:
 
             if submission.id not in self.already_checked_cur_events:
                 title_words_list = nltk.word_tokenize(submission.title.lower())
-
-                print(submission.id)
-                print(str(title_words_list))
 
                 broken_event = self._get_broken_cur_event(title_words_list)
 
@@ -117,9 +117,19 @@ class Filters:
                 self.already_done.append(submission.id)
 
                 tokens = nltk.word_tokenize(title)
-                tagged = nltk.pos_tag(tokens[1:])
+                tokens.remove('eli5')
 
-                print(str(tagged))
+                try:
+                    tokens.remove(':')
+                except ValueError:
+                    pass
+
+                try:
+                    tokens.remove(';')
+                except ValueError:
+                    pass
+
+                tagged = nltk.pos_tag(tokens)
 
                 for word, tag in tagged:
 
@@ -128,8 +138,6 @@ class Filters:
 
                 search_query = ' '.join(words_list)
                 full_search_query = "title:(" + search_query + ")"
-
-                print(str(full_search_query))
 
                 search_result = self.r.search(full_search_query, subreddit="santi871", sort='new')
                 search_result_list = list(search_result)
@@ -143,8 +151,6 @@ class Filters:
                     if int(delta_time / 60) < 180:
                         total_in_threehours += 1
                         search_results_in_last_threehours.append(item)
-
-                print(str(search_results_in_last_threehours))
 
                 if len(search_result_list) >= 4:
 
