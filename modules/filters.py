@@ -23,31 +23,33 @@ class Filters:
 
     def _create_c_events_rule(self, search_results):
 
-        list_of_words_lists = []
+        list_of_tokenized_titles = []
+        final_words_list = []
 
         for index, submission in enumerate(search_results):
 
             if index <= 3:
 
-                words_list = []
+                tokenized_title = submission.title.lower().split()
 
-                tokens = nltk.word_tokenize(submission.title.lower())
-                tagged = nltk.pos_tag(tokens[1:])
-
-                for word, tag in tagged:
-
-                    if tag in self.tags:
-                        words_list.append(word)
-
-                list_of_words_lists.append(words_list)
+                list_of_tokenized_titles.append(tokenized_title)
 
             submission.remove()
 
-        title_keywords_list = intersect(list_of_words_lists[0], list_of_words_lists[1], list_of_words_lists[2])
+        title_words_list = intersect(list_of_tokenized_titles[0], list_of_tokenized_titles[1],
+                                     list_of_tokenized_titles[2])
 
-        self.current_events.append(title_keywords_list)
+        tokens = nltk.word_tokenize(' '.join(title_words_list))
+        tagged = nltk.pos_tag(tokens)
 
-        self.s.send_msg("Created cur event rule: %s" % ' '.join(title_keywords_list), channel_name="eli5bot-dev",
+        for word, tag in tagged:
+
+            if tag in self.tags:
+                final_words_list.append(word)
+
+        self.current_events.append(final_words_list)
+
+        self.s.send_msg("Created cur event rule: %s" % ' '.join(final_words_list), channel_name="eli5bot-dev",
                         confirm=False)
 
     def _get_broken_cur_event(self, title_words_list):
