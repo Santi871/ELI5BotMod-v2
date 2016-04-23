@@ -15,7 +15,7 @@ def intersect(titles):
 
 class Filters:
 
-    """This module implements a set of filters through which submissions can be ran through"""
+    """This class implements a set of filters through which submissions can be ran through"""
 
     current_events = []
 
@@ -87,6 +87,8 @@ class Filters:
             ret = None
 
         return ret
+
+    # -------------- DEFINE NEW FILTERS HERE --------------
 
     def check_current_events(self, submissions):
 
