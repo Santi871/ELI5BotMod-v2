@@ -51,7 +51,7 @@ class Database:
         self.cur.execute(
             "CREATE TABLE IF NOT EXISTS CURRENT_EVENTS"
             "(ID SERIAL PRIMARY KEY,"
-            "EVENT_KEYWORDS TEXT)")
+            "EVENT_KEYWORDS TEXT UNIQUE)")
 
         self.conn.commit()
 
