@@ -31,7 +31,7 @@ class Filters:
 
                 words_list = []
 
-                tokens = nltk.word_tokenize(submission.title)
+                tokens = nltk.word_tokenize(submission.title.lower())
                 tagged = nltk.pos_tag(tokens[1:])
 
                 for word, tag in tagged:
@@ -81,7 +81,7 @@ class Filters:
         for submission in submissions:
 
             if submission.id not in self.already_checked_cur_events:
-                title_words_list = nltk.word_tokenize(submission.title)
+                title_words_list = nltk.word_tokenize(submission.title.lower())
 
                 print(submission.id)
                 print(str(title_words_list))
@@ -105,11 +105,13 @@ class Filters:
                 words_list = []
                 search_results_in_last_threehours = []
                 total_in_threehours = 0
-                title = submission.title
+                title = submission.title.lower()
                 self.already_done.append(submission.id)
 
                 tokens = nltk.word_tokenize(title)
                 tagged = nltk.pos_tag(tokens[1:])
+
+                print(str(tagged))
 
                 for word, tag in tagged:
 
@@ -118,6 +120,8 @@ class Filters:
 
                 search_query = ' '.join(words_list)
                 full_search_query = "title:(" + search_query + ")"
+
+                print(str(full_search_query))
 
                 search_result = self.r.search(full_search_query, subreddit="santi871", sort='new')
                 search_result_list = list(search_result)
@@ -131,6 +135,8 @@ class Filters:
                     if int(delta_time / 60) < 180:
                         total_in_threehours += 1
                         search_results_in_last_threehours.append(item)
+
+                print(str(search_results_in_last_threehours))
 
                 if len(search_result_list) >= 4:
 
