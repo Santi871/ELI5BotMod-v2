@@ -17,8 +17,6 @@ class Filters:
 
     """This class implements a set of filters through which submissions can be ran through"""
 
-    current_events = []
-
     def __init__(self, r, s, db):
 
         self.r = r
@@ -27,6 +25,13 @@ class Filters:
         self.already_done = []
         self.already_checked_cur_events = []
         self.tags = ('NN', 'NNP', 'NNPS', 'JJ', 'NNS', 'VBG', 'VB', 'VBN', 'CD', 'RB', 'VBD')
+        self.filters = []
+
+        for name, f in self.__dict__.items():
+            if name[0] != "_" and callable(f):
+                self.filters.append = name
+
+        print(str(self.filters))
 
     # -------------- DEFINE INTERNAL METHODS NEEDED BY THE FILTERS HERE --------------
 
@@ -43,7 +48,7 @@ class Filters:
 
                 list_of_tokenized_titles.append(tokenized_title)
 
-            submission.remove()
+            # submission.remove()
 
         title_words_list = intersect(list_of_tokenized_titles)
 
@@ -107,7 +112,8 @@ class Filters:
             broken_event = self._get_broken_cur_event(title_words_list)
 
             if broken_event is not None:
-                submission.remove()
+                # submission.remove()
+                submission.report("Current event: %s" % broken_event)
 
             self.already_checked_cur_events.append(submission.id)
 
