@@ -269,7 +269,7 @@ class CommandsHandler:
 
         self.db.insert_entry('recent_event', event_keywords=slack_args['content'][1:])
 
-        msg = self.s.send_msg('*Will now filter submissions containing:* ' + str(slack_args['content'][1:]),
+        msg = self.s.send_msg('*Will now filter submissions containing:* ' + ' '.join(slack_args['content'][1:]),
                               channel_name=slack_args['channel'])
 
 
