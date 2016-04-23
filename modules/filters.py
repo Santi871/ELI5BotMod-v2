@@ -98,7 +98,7 @@ class Filters:
                 broken_event = self._get_broken_cur_event(title_words_list)
 
                 if broken_event is not None:
-                    submission.report("Current event: %s" % broken_event)
+                    submission.remove()
 
                 self.already_checked_cur_events.append(submission.id)
 
