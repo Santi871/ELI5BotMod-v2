@@ -76,7 +76,7 @@ class Database:
             event_keywords_string = ' '.join(event_keywords)
 
             try:
-                self.cur.execute('''INSERT INTO CURRENT_EVENTS(EVENT_KEYWORDS) VALUES(%s)''', (event_keywords_string))
+                self.cur.execute('''INSERT INTO CURRENT_EVENTS(EVENT_KEYWORDS) VALUES(?)''', (event_keywords_string,))
             finally:
                 self.conn.commit()
 
