@@ -55,7 +55,10 @@ class Filters:
             if tag in self.tags:
                 final_words_list.append(word)
 
-        final_words_list.remove('eli5')
+        try:
+            final_words_list.remove('eli5')
+        except ValueError:
+            pass
 
         try:
             final_words_list.remove(':')
