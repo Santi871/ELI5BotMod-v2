@@ -47,6 +47,8 @@ class Filters:
             if tag in self.tags:
                 final_words_list.append(word)
 
+        final_words_list.remove('eli5')
+
         self.current_events.append(final_words_list)
 
         self.s.send_msg("Created cur event rule: %s" % ' '.join(final_words_list), channel_name="eli5bot-dev",
