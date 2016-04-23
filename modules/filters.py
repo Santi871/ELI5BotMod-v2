@@ -66,19 +66,19 @@ class Filters:
 
         self.current_events.append(final_words_list)
 
-        self.s.send_msg("Created cur event rule: %s" % ' '.join(final_words_list), channel_name="eli5bot-dev",
+        self.s.send_msg("*Created current event rule, posts containing:* %s" % ' '.join(final_words_list),
+                        channel_name="eli5bot-dev",
                         confirm=False)
 
     def _get_broken_cur_event(self, title_words_list):
 
         broken_event = None
-        for title in self.current_events:
+        submission_title = ' '.join(title_words_list)
+        for event in self.current_events:
 
-            broken_event = title
+            broken_event = event
 
-            got_intersection = set(title) & set(title_words_list)
-
-            if got_intersection:
+            if all(x in submission_title for x in event):
                 break
 
         if broken_event is not None:
