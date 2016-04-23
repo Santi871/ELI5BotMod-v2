@@ -98,8 +98,7 @@ class Filters:
                 broken_event = self._get_broken_cur_event(title_words_list)
 
                 if broken_event is not None:
-                    submission.report("Broken event: %s" % broken_event)
-                    self.s.send_msg("Broken event: %s" % broken_event, channel_name="eli5bot-dev", confirm=False)
+                    submission.report("Current event: %s" % broken_event)
 
                 self.already_checked_cur_events.append(submission.id)
 
