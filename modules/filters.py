@@ -29,7 +29,7 @@ class Filters:
 
         for name, f in Filters.__dict__.items():
             if name[0] != "_" and callable(f):
-                self.filters.append = name
+                self.filters.append(name)
 
         print(str(self.filters))
 
