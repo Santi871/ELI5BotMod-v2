@@ -2,9 +2,15 @@ import nltk
 import datetime
 
 
-def intersect(a, b, c):
-    print("H " + str(list(set(a) & set(b) & set(c))))
-    return list(set(a) & set(b) & set(c))
+def intersect(titles):
+
+    ret_set = set(titles[0])
+
+    for index, element in enumerate(titles):
+        if index > 0:
+            ret_set = ret_set & set(element)
+
+    return list(ret_set)
 
 
 class Filters:
@@ -19,7 +25,7 @@ class Filters:
         self.s = s
         self.already_done = []
         self.already_checked_cur_events = []
-        self.tags = ('NN', 'NNP', 'NNPS', 'JJ', 'NNS', 'VBG', 'VB', 'VBN', 'CD', 'VBP', 'RB', 'VBD')
+        self.tags = ('NN', 'NNP', 'NNPS', 'JJ', 'NNS', 'VBG', 'VB', 'VBN', 'CD', 'RB', 'VBD')
 
     def _create_c_events_rule(self, search_results):
 
@@ -36,8 +42,7 @@ class Filters:
 
             submission.remove()
 
-        title_words_list = intersect(list_of_tokenized_titles[0], list_of_tokenized_titles[1],
-                                     list_of_tokenized_titles[2])
+        title_words_list = intersect(list_of_tokenized_titles)
 
         tokens = nltk.word_tokenize(' '.join(title_words_list))
         tagged = nltk.pos_tag(tokens)
