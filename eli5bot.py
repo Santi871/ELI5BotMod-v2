@@ -114,8 +114,14 @@ class BotMod:
 
     def scan_new_posts(self, r):
 
-        for submission in praw.helpers.submission_stream(r, 'explainlikeimfive', limit=50, verbosity=0):
-            self.filters.run_filters(submission)
+        while True:
+
+            try:
+                for submission in praw.helpers.submission_stream(r, 'explainlikeimfive', limit=50, verbosity=0):
+                    self.filters.run_filters(submission)
+            except TypeError:
+                time.sleep(1)
+                continue
 
     def check_reports(self, r):
 
