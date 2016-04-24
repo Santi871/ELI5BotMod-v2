@@ -57,8 +57,6 @@ class Database:
 
     def insert_entry(self, entry_type, **kwargs):\
 
-        succeeded = True
-
         if entry_type == "shadowban":
 
             name = kwargs['user']
@@ -69,8 +67,6 @@ class Database:
             try:
                 self.cur.execute('''INSERT INTO SHADOWBANS(USERNAME, REASON, DATE, BY) VALUES(%s,%s,%s,%s)''',
                                  (name, reason, date, author))
-            except psycopg2.Error:
-                succeeded = False
             finally:
                 self.conn.commit()
 
@@ -81,12 +77,8 @@ class Database:
 
             try:
                 self.cur.execute('''INSERT INTO CURRENT_EVENTS(EVENT_KEYWORDS) VALUES(%s)''', (event_keywords_string,))
-            except psycopg2.Error:
-                succeeded = False
             finally:
                 self.conn.commit()
-
-        return succeeded
 
     def retrieve_entries(self, entry_type):
 
