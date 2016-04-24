@@ -444,7 +444,7 @@ class BotMod:
                     if int(delta_time / 60) < 180:
                         total_in_threehours += 1
 
-                if len(search_result_list) >= 3:
+                if len(search_result_list) >= 4:
 
                     msg_string = "---\n*Potential repost detected*\n" + \
                                  title + '\n' + "*POS tagger output:* " + str(tagged) + '\n' + \
