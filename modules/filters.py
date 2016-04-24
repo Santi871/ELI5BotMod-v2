@@ -165,7 +165,7 @@ class Filters:
             while True:
 
                 try:
-                    search_result = self.r.search(full_search_query, subreddit="santi871", sort='new')
+                    search_result = self.r.search(full_search_query, subreddit="explainlikeimfive", sort='new')
                     search_result_list = list(search_result)
                     break
                 except AssertionError:
