@@ -121,10 +121,11 @@ class BotMod:
                         getattr(self.command_handler, command)(r, eventobj.event)
                 except AttributeError:
                     self.s.send_msg('Command not found. Use !commands to see a list of available commands',
-                                    channel_name=channel)
+                                    channel_name=channel, confirm=False)
                     continue
                 except Exception as e:
-                    self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel)
+                    self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel,
+                                    confirm=False)
                     self.slack_log.write(traceback.format_exc())
 
     def scan_new_posts(self, r):

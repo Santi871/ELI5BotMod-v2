@@ -40,7 +40,7 @@ class CommandsHandler:
 
         msg = '\n'.join(self.docs)
 
-        self.s.send_msg(msg, channel_name=event_args['channel'])
+        self.s.send_msg(msg, channel_name=event_args['channel'], confirm=False)
 
     def shadowban(self, *args):
 
@@ -57,7 +57,7 @@ class CommandsHandler:
 
                 self.s.send_msg('Shadowbanning user "%s" for reason "%s"...' % (event_args['text'][1],
                                                                                 ' '.join(event_args['text'][2:])),
-                                channel_name=event_args['channel'])
+                                channel_name=event_args['channel'], confirm=False)
 
                 wiki_page = r.get_wiki_page(self.subreddit, "config/automoderator")
                 wiki_page_content = wiki_page.content_md
@@ -85,17 +85,19 @@ class CommandsHandler:
                                      % (username, event_args['user']))
 
                     self.s.send_msg('Shadowbanned user: ' + "https://www.reddit.com/user/" + username,
-                                    channel_name=event_args['channel'])
+                                    channel_name=event_args['channel'], confirm=False)
 
                 except Exception as e:
-                    self.s.send_msg('Failed to shadowban user.', channel_name=event_args['channel'])
-                    self.s.send_msg('Exception: %s' % e, channel_name=event_args['channel'])
+                    self.s.send_msg('Failed to shadowban user.', channel_name=event_args['channel'], confirm=False)
+                    self.s.send_msg('Exception: %s' % e, channel_name=event_args['channel'], confirm=False)
 
             else:
-                self.s.send_msg('Usage: !shadowban [username] [reason]', channel_name=event_args['channel'])
+                self.s.send_msg('Usage: !shadowban [username] [reason]', channel_name=event_args['channel'],
+                                confirm=False)
 
         else:
-            self.s.send_msg('You are not authorized to run that command.', channel_name=event_args['channel'])
+            self.s.send_msg('You are not authorized to run that command.', channel_name=event_args['channel'],
+                            confirm=False)
 
     def summary(self, *args):
 
@@ -104,7 +106,8 @@ class CommandsHandler:
         r = args[0]
         slack_args = args[1]
 
-        msg = self.s.send_msg('Generating summary, please allow a few seconds...', channel_name=slack_args['channel'])
+        msg = self.s.send_msg('Generating summary, please allow a few seconds...', channel_name=slack_args['channel'],
+                              confirm=False)
 
         i = 0
         total_comments = 0
@@ -254,11 +257,11 @@ class CommandsHandler:
         link = self.imgur.upload_from_path(path, config=None, anon=True)
         msg = self.s.send_msg("Showing summary for */u/" + slack_args['text'][1] +
                               "*. Total comments read: %d" % total_comments_read, channel_name=slack_args['channel'])
-        msg = self.s.send_msg(link['link'], channel_name=slack_args['channel'])
+        msg = self.s.send_msg(link['link'], channel_name=slack_args['channel'], confirm=False)
         msg = self.s.send_msg("*Troll likelihood (experimental):* " + troll_likelihood,
-                              channel_name=slack_args['channel'])
+                              channel_name=slack_args['channel'], confirm=False)
         msg = self.s.send_msg('*User profile:* ' + "https://www.reddit.com/user/" + slack_args['text'][1],
-                              channel_name=slack_args['channel'])
+                              channel_name=slack_args['channel'], confirm=False)
 
         plt.clf()
 
@@ -271,7 +274,7 @@ class CommandsHandler:
         self.db.insert_entry('recent_event', event_keywords=slack_args['text'][1:])
 
         msg = self.s.send_msg('*Will now filter submissions containing:* ' + ' '.join(slack_args['text'][1:]),
-                              channel_name=slack_args['channel'])
+                              channel_name=slack_args['channel'], confirm=False)
 
     def reboot(self, *args):
 
@@ -280,7 +283,7 @@ class CommandsHandler:
         slack_args = args[1]
 
         self.s.send_msg('Restarting bot...',
-                        channel_name=slack_args['channel'])
+                        channel_name=slack_args['channel'], confirm=False)
 
         os.execl(sys.executable, sys.executable, *sys.argv)
 

@@ -20,7 +20,7 @@ def main():
     try:
         botmod = eli5bot.BotMod(s)
     except Exception as e:
-        msg = s.send_msg('Failed to start bot.\n Exception: %s' % e, channel_name=default_channel)
+        msg = s.send_msg('Failed to start bot.\n Exception: %s' % e, channel_name=default_channel, confirm=False)
 
 if __name__ == '__main__':
     main()
