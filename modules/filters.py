@@ -25,7 +25,7 @@ class Filters:
         config = ConfigParser()
         config.read('modules_config.ini')
 
-        self.tags = config.get('filters', 'tags').splt(',')
+        self.tags = config.get('filters', 'tags').split(',')
 
         self.r = r
         self.s = s
