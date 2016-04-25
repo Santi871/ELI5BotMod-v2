@@ -5,6 +5,7 @@ import math
 from imgurpython import ImgurClient
 import puni
 import os
+import sys
 
 
 def get_slack_event_args(slack_event):
@@ -271,6 +272,15 @@ class CommandsHandler:
 
         msg = self.s.send_msg('*Will now filter submissions containing:* ' + ' '.join(slack_args['content'][1:]),
                               channel_name=slack_args['channel'])
+
+    def reboot(self, *args):
+
+        slack_args = args[1]
+
+        self.s.send_msg('Restarting bot...',
+                        channel_name=slack_args['channel'])
+
+        os.execl(sys.executable, sys.executable, *sys.argv)
 
 
 
