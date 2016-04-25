@@ -26,7 +26,8 @@ class CreateThread(threading.Thread):
                 methodToRun = self.method(self.r)
                 print("Exiting " + self.name, file=self.slack_log)
             except:
-                print("*Failure in thread* '%s'. Attempting to restart thread..." % self.name, file=self.slack_log)
+                print("*Unhandled exception"
+                      " in thread* '%s'. Attempting to restart thread..." % self.name, file=self.slack_log)
                 self.slack_log.write(traceback.format_exc())
                 time.sleep(1)
 
@@ -108,20 +109,22 @@ class BotMod:
         # Listen for Slack events
         for eventobj in self.s.events():
 
-            channel = eventobj.event.get('channel')
-            split_message = eventobj.event.get('text').split()
-            command = split_message[0][1:]
+            if eventobj.event is not None:
 
-            try:
-                if split_message[0][0] == "!":
-                    getattr(self.command_handler, command)(r, eventobj.event)
-            except AttributeError:
-                self.s.send_msg('Command not found. Use !commands to see a list of available commands',
-                                channel_name=channel)
-                continue
-            except Exception as e:
-                self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel)
-                self.slack_log.write(traceback.format_exc())
+                channel = eventobj.event.get('channel')
+                split_message = eventobj.event.get('text').split()
+                command = split_message[0][1:]
+
+                try:
+                    if split_message[0][0] == "!":
+                        getattr(self.command_handler, command)(r, eventobj.event)
+                except AttributeError:
+                    self.s.send_msg('Command not found. Use !commands to see a list of available commands',
+                                    channel_name=channel)
+                    continue
+                except Exception as e:
+                    self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel)
+                    self.slack_log.write(traceback.format_exc())
 
     def scan_new_posts(self, r):
 
