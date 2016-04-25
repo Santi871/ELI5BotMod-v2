@@ -1,62 +1,26 @@
 import sys
 import eli5bot
 import os
-import threading
 import time
 from slacksocket import SlackSocket
+from configparser import ConfigParser
 
-class myThread(threading.Thread):
-    def __init__(self, threadID, name, botmod, method):
-        threading.Thread.__init__(self)
-        self.threadID = threadID
-        self.name = name
-        self.botmod = botmod
-        self.method = method
-    def run(self):
-        print("Starting " + self.name)
-        methodToRun = self.method()
-        print("Exiting " + self.name)
-    
 
 def main():
-    s = SlackSocket(os.environ['SLACK_TOKEN'],translate=True)
+    # Get the default Slack channel from config
+    config = ConfigParser()
+    config.read('config.ini')
+    default_channel = config.get('slack', 'default_channel')
 
-    #Running = True
+    # Create a SlackSocket instance with select filters
+    event_filters = ['message']
+    s = SlackSocket(os.environ['SLACK_TOKEN'], translate=True, event_filters=event_filters)
 
-    #while Running:
-
-    botmod = None
-
+    # Try to create an instance of the bot
     try:
         botmod = eli5bot.BotMod(s)
     except Exception as e:
-        msg = s.send_msg('Failed to start bot.\n Exception: %s' % e, channel_name="eli5bot-dev")
-        sys.exit()
-
-    time.sleep(2)
-
-    listenerThread = myThread(1, "Event listener", botmod, botmod.listenToChat)
-    listenerThread.start()
-
-    time.sleep(2)
-
-    modmailThread = myThread(2, "Modmail logger", botmod, botmod.refreshModmail)
-    modmailThread.start()
-
-    time.sleep(2)
-
-    bansThread = myThread(3, "Bans logger", botmod, botmod.refreshBans)
-    bansThread.start()
-
-    time.sleep(2)
-
-    repostThread = myThread(4, "Repost detector", botmod, botmod.repost_detector)
-    repostThread.start()
-
-    time.sleep(2)
-
-    reportsThread = myThread(5, "Report checker", botmod, botmod.check_reports)
-    reportsThread.start()
+        msg = s.send_msg('Failed to start bot.\n Exception: %s' % e, channel_name=default_channel, confirm=False)
 
 if __name__ == '__main__':
     main()
