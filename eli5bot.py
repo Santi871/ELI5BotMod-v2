@@ -38,7 +38,7 @@ class BotMod:
             from modules import slacklogger
             slack_log = slacklogger.SlackLogger(s, 'eli5bot-log')
 
-        print("Initializing BotMod...", file=slack_log)
+        print("Initializing BotMod...", file=slack_log, flush=False)
         self.s = s
         self.devmode = devmode
         self.use_database = use_database
@@ -48,7 +48,7 @@ class BotMod:
         self.refreshing = True
         self.already_done_reposts = []
 
-        print("Connecting to reddit...", file=slack_log)
+        print("Connecting to reddit...", file=slack_log, flush=False)
 
         app_uri = 'https://127.0.0.1:65010/authorize_callback'
         self.r = praw.Reddit(user_agent='windows:ELI5Mod:v3 (by /u/santi871)')
