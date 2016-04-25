@@ -1,6 +1,7 @@
 import nltk
 import datetime
 import time
+from configparser import ConfigParser
 
 
 def intersect(titles):
@@ -20,12 +21,17 @@ class Filters:
 
     def __init__(self, r, s, db, subreddit):
 
+        # Parse config
+        config = ConfigParser()
+        config.read('modules_config.ini')
+
+        self.tags = config.get('filters', 'tags').splt(',')
+
         self.r = r
         self.s = s
         self.db = db
         self.already_done_reposts = []
         self.already_checked_cur_events = []
-        self.tags = ('NN', 'NNP', 'NNPS', 'JJ', 'NNS', 'VBG', 'VB', 'VBN', 'CD', 'RB', 'VBD')
         self.filters = []
         self.subreddit = subreddit
 
