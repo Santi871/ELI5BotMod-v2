@@ -85,7 +85,7 @@ class BotMod:
         self.subreddit2 = self.r.get_subreddit(self.subreddit)
         self.un = puni.UserNotes(self.r, self.subreddit2)
 
-        print("Done initializing.")
+        print("Done initializing.", file=self.slack_log)
 
     def create_thread(self, method):
 
