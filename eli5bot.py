@@ -9,12 +9,13 @@ import traceback
 
 
 class CreateThread(threading.Thread):
-    def __init__(self, thread_id, name, method, r):
+    def __init__(self, thread_id, name, method, r, slacklog):
         threading.Thread.__init__(self)
         self.threadID = thread_id
         self.name = name
         self.method = method
         self.r = r
+        self.slack_log = slacklog
 
     def run(self):
 
@@ -24,7 +25,8 @@ class CreateThread(threading.Thread):
                 methodToRun = self.method(self.r)
                 print("Exiting " + self.name)
             except Exception as e:
-                print("Failure in thread '%s', exception: %s" % (self.name, e))
+                print("Failure in thread '%s'" % self.name)
+                self.slack_log.write(traceback.format_exc())
                 time.sleep(1)
 
 
@@ -85,8 +87,7 @@ class BotMod:
 
         print("Done initializing.")
 
-    @staticmethod
-    def create_thread(method):
+    def create_thread(self, method):
 
         app_uri = 'https://127.0.0.1:65010/authorize_callback'
         thread_r = praw.Reddit(user_agent='windows:ELI5Mod:v3 (by /u/santi871)')
@@ -94,7 +95,7 @@ class BotMod:
         thread_r.refresh_access_information(os.environ['REDDIT_REFRESH_TOKEN'])
         thread_r.config.api_request_delay = 1
 
-        thread = CreateThread(1, str(method) + " thread", method, thread_r)
+        thread = CreateThread(1, str(method) + " thread", method, thread_r, self.slack_log)
         thread.start()
 
     def listen_to_chat(self, r):
@@ -131,6 +132,8 @@ class BotMod:
             except TypeError:
                 time.sleep(1)
                 continue
+            except:
+                self.slack_log.write(traceback.format_exc())
 
     def check_reports(self, r):
 
