@@ -32,7 +32,7 @@ class BotMod:
 
     def __init__(self, s, devmode=False, use_database=False, use_commands=True, use_filters=True, use_slack_log=True):
 
-        slack_log = None
+        slack_log = sys.stdout
 
         if use_slack_log:
             from modules import slacklogger
@@ -56,7 +56,7 @@ class BotMod:
         self.r.refresh_access_information(os.environ['REDDIT_REFRESH_TOKEN'])
         self.r.config.api_request_delay = 1
 
-        print("Connected to reddit.")
+        print("Connected to reddit.", file=slack_log)
 
         if use_database:
 

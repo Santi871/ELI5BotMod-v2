@@ -7,7 +7,7 @@ from slacksocket import SlackSocket
 
 
 def main():
-    s = SlackSocket(os.environ['SLACK_TOKEN'],translate=True)
+    s = SlackSocket(os.environ['SLACK_TOKEN'], translate=True)
 
     # config = configparser.ConfigParser()
     # config.read('config.ini')
