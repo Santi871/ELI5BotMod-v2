@@ -1,12 +1,13 @@
+import sys
 
 
 class SlackLogger:
 
     """This class pipes stdout a Slack channel"""
 
-    def __init__(self, stdout, s, channel):
+    def __init__(self, s, channel):
         self.s = s
-        self.terminal = stdout
+        self.terminal = sys.stdout
         self.channel = channel
 
     def write(self, message):

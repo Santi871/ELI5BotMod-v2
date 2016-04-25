@@ -34,7 +34,7 @@ class BotMod:
 
         if slack_log:
             from modules import slacklogger
-            sys.stdout = slacklogger.SlackLogger(sys.stdout, s, 'eli5bot-log')
+            sys.stdout = slacklogger.SlackLogger(s, 'eli5bot-log')
 
         print("Initializing BotMod...")
         self.s = s
@@ -49,8 +49,7 @@ class BotMod:
         print("Connecting to reddit...")
 
         app_uri = 'https://127.0.0.1:65010/authorize_callback'
-        self.r = praw.Reddit(user_agent='windows:ELI5Mod:v3 (by /u/santi871)'
-                                        ' More at: https://github.com/Santi871/ELI5BotMod-v2')
+        self.r = praw.Reddit(user_agent='windows:ELI5Mod:v3 (by /u/santi871)')
         self.r.set_oauth_app_info(os.environ['REDDIT_APP_ID'], os.environ['REDDIT_APP_SECRET'], app_uri)
         self.r.refresh_access_information(os.environ['REDDIT_REFRESH_TOKEN'])
         self.r.config.api_request_delay = 1
