@@ -2,7 +2,10 @@
 
 class SlackLogger:
 
-    """This class pipes stdout a Slack channel"""
+    """
+    This class sends messages you wish to log to a log channel
+    Eg prints, tracebacks, etc.
+    """
 
     def __init__(self, s, channel):
         self.s = s
