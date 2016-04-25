@@ -7,7 +7,6 @@ import psycopg2
 import time
 import nltk
 import threading
-from modules import filters
 
 
 class CreateThread(threading.Thread):
@@ -34,7 +33,7 @@ class BotMod:
 
     """Main class for BotMod"""
 
-    def __init__(self, s, devmode=False, use_database=False, use_commands=True, search_reposts=True):
+    def __init__(self, s, devmode=False, use_database=False, use_commands=True, use_filters=True):
 
         print("Initializing BotMod...")
         self.s = s
@@ -71,8 +70,10 @@ class BotMod:
             self.command_handler = self.commands_module.CommandsHandler(self, self.s, self.db)
             self.create_thread(self.listen_to_chat)
 
-        self.filters = filters.Filters(self.r, self.s, self.db)
-        self.create_thread(self.scan_new_posts)
+        if use_filters:
+            from modules import filters
+            self.filters = filters.Filters(self.r, self.s, self.db)
+            self.create_thread(self.scan_new_posts)
 
         if self.devmode:
             self.subreddit = "santi871"
