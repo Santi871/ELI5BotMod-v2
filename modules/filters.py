@@ -26,6 +26,7 @@ class Filters:
         config.read('modules_config.ini')
 
         self.tags = config.get('filters', 'tags').split(',')
+        self.verbose = config.getboolean('filters', 'verbose')
 
         self.r = r
         self.s = s
@@ -203,15 +204,16 @@ class Filters:
 
                 if len(search_result_list) >= 4:
 
-                    msg_string = "---\n*Potential repost detected*\n" + \
-                                 title + '\n' + "*POS tagger output:* " + str(tagged) + '\n' + \
-                                 '*Link:* ' + submission.permalink + '\n' + "*Search query:* " + full_search_query + \
-                                 '\n' + '*Search results:*\n'
+                    if self.verbose:
+                        msg_string = "---\n*Potential repost detected*\n" + \
+                                     title + '\n' + "*POS tagger output:* " + str(tagged) + '\n' + \
+                                     '*Link:* ' + submission.permalink + '\n' + "*Search query:* " + full_search_query + \
+                                     '\n' + '*Search results:*\n'
 
-                    for item in search_result_list:
-                        msg_string += str(item) + '\n'
+                        for item in search_result_list:
+                            msg_string += str(item) + '\n'
 
-                    msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
+                        msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
 
                     submission.report("Potential repost")
                     return False

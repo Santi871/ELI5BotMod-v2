@@ -53,6 +53,7 @@ class BotMod:
         self.slack_log = slacklogger.SlackLogger(s, slack_log_channel)
 
         # Initialize some variables and constants
+        print("----------------------", file=self.slack_log)
         print("Initializing BotMod...", file=self.slack_log)
         self.s = s
         self.listening = False
@@ -76,8 +77,7 @@ class BotMod:
         # If we are using the commands module
         if use_commands:
             from modules import commands as commands_module
-            self.commands_module = commands_module
-            self.command_handler = self.commands_module.CommandsHandler(self, self.s, self.subreddit, self.db)
+            self.command_handler = commands_module.CommandsHandler(self, self.s, self.subreddit, self.db)
             self.create_thread(self.listen_to_chat)  # Start a thread to watch Slack chat
 
         # If we are using the filters module
@@ -117,6 +117,7 @@ class BotMod:
 
                 try:
                     if split_message[0][0] == "!":
+                        print(command, file=self.slack_log)
                         getattr(self.command_handler, command)(r, eventobj.event)
                 except AttributeError:
                     self.s.send_msg('Command not found. Use !commands to see a list of available commands',
