@@ -48,7 +48,7 @@ class BotMod:
         self.refreshing = True
         self.already_done_reposts = []
 
-        print("Connecting to reddit...")
+        print("Connecting to reddit...", file=slack_log)
 
         app_uri = 'https://127.0.0.1:65010/authorize_callback'
         self.r = praw.Reddit(user_agent='windows:ELI5Mod:v3 (by /u/santi871)')
