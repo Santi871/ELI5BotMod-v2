@@ -116,7 +116,7 @@ class BotMod:
 
                     try:
                         if args[0][0] == "!":
-                            getattr(self.command_handler, "sadsdadd")(r, args_dict)
+                            getattr(self.command_handler, command)(r, args_dict)
                     except Exception as e:
                         self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel)
                         self.slack_log.write(traceback.format_exc())
