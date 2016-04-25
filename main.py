@@ -15,7 +15,7 @@ def main():
     try:
         botmod = eli5bot.BotMod(s, use_database=True)
     except Exception as e:
-        msg = s.send_msg('Failed to start bot.\n Exception: %s' % e, channel_name="eli5bot-dev")
+        msg = s.send_msg('Failed to start bot.\n Exception: %s' % e, channel_name="eli5bot-log")
         sys.exit()
 
     time.sleep(2)

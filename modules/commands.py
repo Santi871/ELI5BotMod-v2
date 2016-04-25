@@ -39,7 +39,7 @@ class CommandsHandler:
         self.docs = []
 
         for name, f in CommandsHandler.__dict__.items():
-            if callable(f) and hasattr(f, __doc__) and name[0] != "_":
+            if callable(f) and hasattr(f, "__doc__") and name[0] != "_":
                 self.docs.append(f.__doc__)
 
     #  ----------- DEFINE COMMANDS HERE -----------
