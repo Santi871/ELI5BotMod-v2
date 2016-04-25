@@ -2,7 +2,6 @@ import praw
 import os
 import puni
 import time
-import sys
 import threading
 from modules import slacklogger
 import traceback
@@ -25,7 +24,7 @@ class CreateThread(threading.Thread):
                 methodToRun = self.method(self.r)
                 print("Exiting " + self.name)
             except Exception as e:
-                print("Failure in thread '%s'" % self.name)
+                print("Failure in thread '%s'. Attempting to restart thread..." % self.name, file=self.slack_log)
                 self.slack_log.write(traceback.format_exc())
                 time.sleep(1)
 
