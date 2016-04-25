@@ -18,7 +18,7 @@ class Filters:
 
     """This class implements a set of filters through which submissions can be ran through"""
 
-    def __init__(self, r, s, db):
+    def __init__(self, r, s, db, subreddit):
 
         self.r = r
         self.s = s
@@ -27,6 +27,7 @@ class Filters:
         self.already_checked_cur_events = []
         self.tags = ('NN', 'NNP', 'NNPS', 'JJ', 'NNS', 'VBG', 'VB', 'VBN', 'CD', 'RB', 'VBD')
         self.filters = []
+        self.subreddit = subreddit
 
         for name, f in Filters.__dict__.items():
             if callable(f) and name[0] != "_" and name != "run_filters":
@@ -175,7 +176,7 @@ class Filters:
             while True:
 
                 try:
-                    search_result = self.r.search(full_search_query, subreddit="explainlikeimfive", sort='new')
+                    search_result = self.r.search(full_search_query, subreddit=self.subreddit, sort='new')
                     search_result_list = list(search_result)
                     break
                 except AssertionError:

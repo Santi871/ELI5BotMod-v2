@@ -12,12 +12,13 @@ class CommandsHandler:
 
     """This class handles commands, you can define new commands here"""
 
-    def __init__(self, obj, s, db=None):
+    def __init__(self, obj, s, subreddit, db=None):
 
         self.obj = obj
         self.un = None
         self.s = s
         self.db = db
+        self.subreddit = subreddit
 
         self.usergroup_owner = 'santi871'
         self.usergroup_mod = ('santi871', 'akuthia', 'mason11987', 'mike_pants', 'mjcapples', 'securethruobscure',
@@ -48,7 +49,7 @@ class CommandsHandler:
         r = args[0]
         event_args = args[1]
 
-        un = puni.UserNotes(r, r.get_subreddit('explainlikeimfive'))
+        un = puni.UserNotes(r, r.get_subreddit(self.subreddit))
 
         if event_args['user'] in self.usergroup_mod:
 
@@ -58,7 +59,7 @@ class CommandsHandler:
                                                                                 ' '.join(event_args['text'][2:])),
                                 channel_name=event_args['channel'])
 
-                wiki_page = r.get_wiki_page('explainlikeimfive', "config/automoderator")
+                wiki_page = r.get_wiki_page(self.subreddit, "config/automoderator")
                 wiki_page_content = wiki_page.content_md
 
                 beg_ind = wiki_page_content.find("shadowbans")
@@ -79,7 +80,7 @@ class CommandsHandler:
                              wiki_page_content[beg_ind:end_ind].replace("]", replacement) + \
                              wiki_page_content[end_ind:]
 
-                    r.edit_wiki_page('explainlikeimfive', "config/automoderator", newstr,
+                    r.edit_wiki_page(self.subreddit, "config/automoderator", newstr,
                                      reason='ELI5_ModBot shadowban user "/u/%s" executed by "/u/%s"'
                                      % (username, event_args['user']))
 

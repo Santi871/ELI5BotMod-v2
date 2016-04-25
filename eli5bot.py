@@ -42,10 +42,10 @@ class BotMod:
         config.read('config.ini')
 
         self.devmode = config.getboolean('bot', 'test_mode')
-        self.use_database = config.getboolean('modules', 'use_database')
+        self.use_database = config.getboolean('modules', 'database')
         self.subreddit = config.get('bot', 'subreddit')
-        use_filters = config.getboolean('modules', 'use_filters')
-        use_commands = config.getboolean('modules', 'use_commands')
+        use_filters = config.getboolean('modules', 'filters')
+        use_commands = config.getboolean('modules', 'commands')
         slack_log_channel = config.get('slack', 'log_channel')
 
         # Get an instance of SlackLogger to print to Slack log channel
@@ -69,20 +69,20 @@ class BotMod:
         if self.use_database:
             from modules import database
             print("Connecting to database...")
-            self.db = database.Database() # Create a database object
+            self.db = database.Database()  # Create a database object
             print("Connected to database.")
 
         # If we are using the commands module
         if use_commands:
             from modules import commands as commands_module
             self.commands_module = commands_module
-            self.command_handler = self.commands_module.CommandsHandler(self, self.s, self.db)
+            self.command_handler = self.commands_module.CommandsHandler(self, self.s, self.subreddit, self.db)
             self.create_thread(self.listen_to_chat)  # Start a thread to watch Slack chat
 
         # If we are using the filters module
         if use_filters:
             from modules import filters
-            self.filters = filters.Filters(self.r, self.s, self.db)  # Create an instance of Filters
+            self.filters = filters.Filters(self.r, self.s, self.db, self.subreddit)  # Create an instance of Filters
             self.create_thread(self.scan_new_posts)  # Start a thread to scan incoming submissions
 
         # Get an instance of UserNotes
