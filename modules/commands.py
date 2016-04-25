@@ -36,19 +36,25 @@ class CommandsHandler:
 
         self.imgur = ImgurClient(os.environ['IMGUR_CLIENT_ID'], os.environ['IMGUR_CLIENT_SECRET'])
 
+        self.docs = []
+
+        for name, f in CommandsHandler.__dict__.items():
+            if callable(f) and hasattr(f, __doc__) and name[0] != "_":
+                self.docs.append(f.__doc__)
+
     #  ----------- DEFINE COMMANDS HERE -----------
 
     def commands(self, *args):
 
         event_args = args[1]
 
-        self.s.send_msg('!shadowban [user] [reason]: Shadowbans user and adds'
-                        ' usernote with reason - USERNAME IS CASE SENSITIVE!\n'
-                        '!summary [user]: generates a summary of [user]\n'
-                        '---Made by /u/Santi871 using SlackSocket + PRAW in Python 3.5',
-                        channel_name=event_args['channel'])
+        msg = '\n'.join(self.docs)
+
+        self.s.send_msg(msg, channel_name=event_args['channel'])
 
     def shadowban(self, *args):
+
+        """!shadowban [user] [reason]: Shadowbans user and adds usernote with reason - USERNAME IS CASE SENSITIVE!"""
 
         r = args[0]
         event_args = args[1]
@@ -102,6 +108,8 @@ class CommandsHandler:
             self.s.send_msg('You are not authorized to run that command.', channel_name=event_args['channel'])
 
     def summary(self, *args):
+
+        """!summary [user]: generates a summary of [user]"""
 
         r = args[0]
         slack_args = args[1]
@@ -266,6 +274,9 @@ class CommandsHandler:
 
     def addrule(self, *args):
 
+        """!addrule [words to be filtered]: Creates a rule to filter new submissions that contain ALL the words
+        in [words to be filtered]"""
+
         slack_args = args[1]
 
         self.db.insert_entry('recent_event', event_keywords=slack_args['content'][1:])
@@ -274,6 +285,8 @@ class CommandsHandler:
                               channel_name=slack_args['channel'])
 
     def reboot(self, *args):
+
+        """!reboot: restarts the bot"""
 
         slack_args = args[1]
 
