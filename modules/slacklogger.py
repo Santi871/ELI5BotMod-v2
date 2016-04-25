@@ -12,4 +12,5 @@ class SlackLogger:
 
     def write(self, message):
         self.terminal.write(message)
+        print(message)
         self.s.send_msg(message, channel_name=self.channel)
