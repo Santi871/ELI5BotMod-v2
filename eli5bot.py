@@ -109,7 +109,7 @@ class BotMod:
         # Listen for Slack events
         for eventobj in self.s.events():
 
-            if eventobj.event is not None:
+            if eventobj.event.get('text') is not None:
 
                 channel = eventobj.event.get('channel')
                 split_message = eventobj.event.get('text').split()
