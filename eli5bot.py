@@ -4,6 +4,8 @@ import puni
 import time
 import sys
 import threading
+from modules import slacklogger
+import traceback
 
 
 class CreateThread(threading.Thread):
@@ -30,15 +32,11 @@ class BotMod:
 
     """Main class for BotMod"""
 
-    def __init__(self, s, devmode=False, use_database=False, use_commands=True, use_filters=True, use_slack_log=True):
+    def __init__(self, s, devmode=False, use_database=False, use_commands=True, use_filters=True):
 
-        slack_log = sys.stdout
+        self.slack_log = slacklogger.SlackLogger(s, 'eli5bot-log')
 
-        if use_slack_log:
-            from modules import slacklogger
-            slack_log = slacklogger.SlackLogger(s, 'eli5bot-log')
-
-        print("Initializing BotMod...", file=slack_log)
+        print("Initializing BotMod...", file=self.slack_log)
         self.s = s
         self.devmode = devmode
         self.use_database = use_database
@@ -48,7 +46,7 @@ class BotMod:
         self.refreshing = True
         self.already_done_reposts = []
 
-        print("Connecting to reddit...", file=slack_log)
+        print("Connecting to reddit...", file=self.slack_log)
 
         app_uri = 'https://127.0.0.1:65010/authorize_callback'
         self.r = praw.Reddit(user_agent='windows:ELI5Mod:v3 (by /u/santi871)')
@@ -56,7 +54,7 @@ class BotMod:
         self.r.refresh_access_information(os.environ['REDDIT_REFRESH_TOKEN'])
         self.r.config.api_request_delay = 1
 
-        print("Connected to reddit.", file=slack_log)
+        print("Connected to reddit.", file=self.slack_log)
 
         if use_database:
 
@@ -118,9 +116,10 @@ class BotMod:
 
                     try:
                         if args[0][0] == "!":
-                            getattr(self.command_handler, command)(r, args_dict)
+                            getattr(self.command_handler, "sadsdadd")(r, args_dict)
                     except Exception as e:
                         self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel)
+                        self.slack_log.write(traceback.format_exc())
 
     def scan_new_posts(self, r):
 
