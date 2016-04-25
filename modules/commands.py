@@ -54,7 +54,7 @@ class CommandsHandler:
 
     def shadowban(self, *args):
 
-        """!shadowban [user] [reason]: Shadowbans user and adds usernote with reason - USERNAME IS CASE SENSITIVE!"""
+        """!shadowban [user] [reason]: Shadowbans [user] and adds usernote [reason] - USERNAME IS CASE SENSITIVE!"""
 
         r = args[0]
         event_args = args[1]
@@ -274,8 +274,7 @@ class CommandsHandler:
 
     def addrule(self, *args):
 
-        """!addrule [words to be filtered]: Creates a rule to filter new submissions that contain ALL the words
-        in [words to be filtered]"""
+        """!addrule [words to be filtered]: Creates a rule to filter new questions that contain ALL the words passed"""
 
         slack_args = args[1]
 
