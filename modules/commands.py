@@ -8,17 +8,6 @@ import os
 import sys
 
 
-def get_slack_event_args(slack_event):
-
-    args = dict()
-
-    args['channel'] = slack_event.get('channel')
-    args['content'] = slack_event.get('text').split()
-    args['author'] = slack_event.get('user')
-
-    return args
-
-
 class CommandsHandler:
 
     """This class handles commands, you can define new commands here"""
@@ -61,12 +50,12 @@ class CommandsHandler:
 
         un = puni.UserNotes(r, r.get_subreddit('explainlikeimfive'))
 
-        if event_args['author'] in self.usergroup_mod:
+        if event_args['user'] in self.usergroup_mod:
 
-            if len(event_args['content']) >= 3:
+            if len(event_args['text']) >= 3:
 
-                self.s.send_msg('Shadowbanning user "%s" for reason "%s"...' % (event_args['content'][1],
-                                                                                ' '.join(event_args['content'][2:])),
+                self.s.send_msg('Shadowbanning user "%s" for reason "%s"...' % (event_args['text'][1],
+                                                                                ' '.join(event_args['text'][2:])),
                                 channel_name=event_args['channel'])
 
                 wiki_page = r.get_wiki_page('explainlikeimfive', "config/automoderator")
@@ -74,14 +63,14 @@ class CommandsHandler:
 
                 beg_ind = wiki_page_content.find("shadowbans")
                 end_ind = wiki_page_content.find("#end shadowbans", beg_ind)
-                username = event_args['content'][1]
-                reason = event_args['content'][2:]
+                username = event_args['text'][1]
+                reason = event_args['text'][2:]
 
                 try:
                     if self.db is not None:
-                        self.db.insert_entry("shadowban", user=username, reason=reason, author=event_args['author'])
+                        self.db.insert_entry("shadowban", user=username, reason=reason, author=event_args['user'])
 
-                    n = puni.Note(username, "Shadowbanned, reason: %s" % reason, event_args['author'], '', 'botban')
+                    n = puni.Note(username, "Shadowbanned, reason: %s" % reason, event_args['user'], '', 'botban')
                     un.add_note(n)
 
                     replacement = ', "%s"]' % username
@@ -92,7 +81,7 @@ class CommandsHandler:
 
                     r.edit_wiki_page('explainlikeimfive', "config/automoderator", newstr,
                                      reason='ELI5_ModBot shadowban user "/u/%s" executed by "/u/%s"'
-                                     % (username, event_args['author']))
+                                     % (username, event_args['user']))
 
                     self.s.send_msg('Shadowbanned user: ' + "https://www.reddit.com/user/" + username,
                                     channel_name=event_args['channel'])
@@ -133,7 +122,7 @@ class CommandsHandler:
                                   'tumblrinaction', 'offensivespeech', 'bixnood')
         total_negative_karma = 0
         limit = 500
-        user = r.get_redditor(slack_args['content'][1])
+        user = r.get_redditor(slack_args['text'][1])
         x = []
         y = []
         s = []
@@ -237,7 +226,7 @@ class CommandsHandler:
         plt.pie(sizes, labels=labels, colors=colors,
                 autopct=None, startangle=90)
         plt.axis('equal')
-        plt.title('User summary for /u/' + slack_args['content'][1], loc='center', y=1.2)
+        plt.title('User summary for /u/' + slack_args['text'][1], loc='center', y=1.2)
 
         ax1 = plt.subplot(3, 1, 2)
         x_inv = list(reversed(x))
@@ -252,7 +241,7 @@ class CommandsHandler:
         plt.xlabel('Comment date')
         plt.ylabel('Total comment karma')
 
-        filename = slack_args['content'][1] + "_summary.png"
+        filename = slack_args['text'][1] + "_summary.png"
 
         figure = plt.gcf()
         figure.set_size_inches(11, 12)
@@ -262,12 +251,12 @@ class CommandsHandler:
         path = "/app/" + filename
 
         link = self.imgur.upload_from_path(path, config=None, anon=True)
-        msg = self.s.send_msg("Showing summary for */u/" + slack_args['content'][1] +
+        msg = self.s.send_msg("Showing summary for */u/" + slack_args['text'][1] +
                               "*. Total comments read: %d" % total_comments_read, channel_name=slack_args['channel'])
         msg = self.s.send_msg(link['link'], channel_name=slack_args['channel'])
         msg = self.s.send_msg("*Troll likelihood (experimental):* " + troll_likelihood,
                               channel_name=slack_args['channel'])
-        msg = self.s.send_msg('*User profile:* ' + "https://www.reddit.com/user/" + slack_args['content'][1],
+        msg = self.s.send_msg('*User profile:* ' + "https://www.reddit.com/user/" + slack_args['text'][1],
                               channel_name=slack_args['channel'])
 
         plt.clf()
@@ -278,9 +267,9 @@ class CommandsHandler:
 
         slack_args = args[1]
 
-        self.db.insert_entry('recent_event', event_keywords=slack_args['content'][1:])
+        self.db.insert_entry('recent_event', event_keywords=slack_args['text'][1:])
 
-        msg = self.s.send_msg('*Will now filter submissions containing:* ' + ' '.join(slack_args['content'][1:]),
+        msg = self.s.send_msg('*Will now filter submissions containing:* ' + ' '.join(slack_args['text'][1:]),
                               channel_name=slack_args['channel'])
 
     def reboot(self, *args):

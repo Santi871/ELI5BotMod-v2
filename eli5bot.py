@@ -3,8 +3,9 @@ import os
 import puni
 import time
 import threading
-from modules import slacklogger
 import traceback
+import configparser
+from modules import slacklogger
 
 
 class CreateThread(threading.Thread):
@@ -18,11 +19,12 @@ class CreateThread(threading.Thread):
 
     def run(self):
 
+        # This loop will run when the thread raises an exception
         while True:
             try:
-                print("Starting " + self.name)
+                print("Starting " + self.name, file=self.slack_log)
                 methodToRun = self.method(self.r)
-                print("Exiting " + self.name)
+                print("Exiting " + self.name, file=self.slack_log)
             except:
                 print("*Failure in thread* '%s'. Attempting to restart thread..." % self.name, file=self.slack_log)
                 self.slack_log.write(traceback.format_exc())
@@ -33,110 +35,108 @@ class BotMod:
 
     """Main class for BotMod"""
 
-    def __init__(self, s, devmode=False, use_database=False, use_commands=True, use_filters=True):
+    def __init__(self, s):
 
-        self.slack_log = slacklogger.SlackLogger(s, 'eli5bot-log')
+        # Parse config
+        config = configparser.ConfigParser()
+        config.read('config.ini')
 
+        self.devmode = config.getboolean('bot', 'test_mode')
+        self.use_database = config.getboolean('modules', 'use_database')
+        self.subreddit = config.get('bot', 'subreddit')
+        use_filters = config.getboolean('modules', 'use_filters')
+        use_commands = config.getboolean('modules', 'use_commands')
+        slack_log_channel = config.get('slack', 'log_channel')
+
+        # Get an instance of SlackLogger to print to Slack log channel
+        self.slack_log = slacklogger.SlackLogger(s, slack_log_channel)
+
+        # Initialize some variables and constants
         print("Initializing BotMod...", file=self.slack_log)
         self.s = s
-        self.devmode = devmode
-        self.use_database = use_database
         self.listening = False
-        self.channel = None
-        self.subreddit = None
-        self.refreshing = True
-        self.already_done_reposts = []
 
+        # Authenticate with reddit via OAuth2
         print("Connecting to reddit...", file=self.slack_log)
-
         app_uri = 'https://127.0.0.1:65010/authorize_callback'
         self.r = praw.Reddit(user_agent='windows:ELI5Mod:v3 (by /u/santi871)')
         self.r.set_oauth_app_info(os.environ['REDDIT_APP_ID'], os.environ['REDDIT_APP_SECRET'], app_uri)
         self.r.refresh_access_information(os.environ['REDDIT_REFRESH_TOKEN'])
         self.r.config.api_request_delay = 1
-
         print("Connected to reddit.", file=self.slack_log)
 
-        if use_database:
-
+        # If we are using the database module
+        if self.use_database:
             from modules import database
             print("Connecting to database...")
-            self.db = database.Database()
+            self.db = database.Database() # Create a database object
             print("Connected to database.")
 
+        # If we are using the commands module
         if use_commands:
-
             from modules import commands as commands_module
             self.commands_module = commands_module
             self.command_handler = self.commands_module.CommandsHandler(self, self.s, self.db)
-            self.create_thread(self.listen_to_chat)
+            self.create_thread(self.listen_to_chat)  # Start a thread to watch Slack chat
 
+        # If we are using the filters module
         if use_filters:
             from modules import filters
-            self.filters = filters.Filters(self.r, self.s, self.db)
-            self.create_thread(self.scan_new_posts)
+            self.filters = filters.Filters(self.r, self.s, self.db)  # Create an instance of Filters
+            self.create_thread(self.scan_new_posts)  # Start a thread to scan incoming submissions
 
-        if self.devmode:
-            self.subreddit = "santi871"
-        else:
-            self.subreddit = "explainlikeimfive"
-
-        self.subreddit2 = self.r.get_subreddit(self.subreddit)
-        self.un = puni.UserNotes(self.r, self.subreddit2)
+        # Get an instance of UserNotes
+        self.un = puni.UserNotes(self.r, self.r.get_subreddit(self.subreddit))
 
         print("Done initializing.", file=self.slack_log)
 
     def create_thread(self, method):
 
+        # Threads need their own authenticated reddit instance, so we make one
         app_uri = 'https://127.0.0.1:65010/authorize_callback'
         thread_r = praw.Reddit(user_agent='windows:ELI5Mod:v3 (by /u/santi871)')
         thread_r.set_oauth_app_info(os.environ['REDDIT_APP_ID'], os.environ['REDDIT_APP_SECRET'], app_uri)
         thread_r.refresh_access_information(os.environ['REDDIT_REFRESH_TOKEN'])
         thread_r.config.api_request_delay = 1
 
+        # Create a thread with the method and reddit instance we called
         thread = CreateThread(1, str(method) + " thread", method, thread_r, self.slack_log)
         thread.start()
 
     def listen_to_chat(self, r):
 
-        self.listening = True
+        # Listen for Slack events
+        for eventobj in self.s.events():
 
-        while self.listening:
-            event = self.s.get_event()
-            slack_event = event.event
+            channel = eventobj.event.get('channel')
+            split_message = eventobj.event.get('text').split()
+            command = split_message[0][1:]
 
-            if slack_event.get('type') == 'message':
-
-                if slack_event.get('text') is not None:
-                    args = slack_event.get('text').split()
-
-                    channel = slack_event.get('channel')
-                    command = args[0][1:]
-                    args_dict = self.commands_module.get_slack_event_args(slack_event)
-
-                    try:
-                        if args[0][0] == "!":
-                            getattr(self.command_handler, command)(r, args_dict)
-                    except AttributeError:
-                        self.s.send_msg('Command not found. Use !commands to see a list of available commands',
-                                        channel_name=channel)
-                        continue
-                    except Exception as e:
-                        self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel)
-                        self.slack_log.write(traceback.format_exc())
+            try:
+                if split_message[0][0] == "!":
+                    getattr(self.command_handler, command)(r, eventobj.event)
+            except AttributeError:
+                self.s.send_msg('Command not found. Use !commands to see a list of available commands',
+                                channel_name=channel)
+                continue
+            except Exception as e:
+                self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel)
+                self.slack_log.write(traceback.format_exc())
 
     def scan_new_posts(self, r):
 
         while True:
 
             try:
-                for submission in praw.helpers.submission_stream(r, 'explainlikeimfive', limit=50, verbosity=0):
+                for submission in praw.helpers.submission_stream(r, self.subreddit, limit=50, verbosity=0):
                     self.filters.run_filters(submission)
             except TypeError:
                 time.sleep(1)
                 continue
             except:
                 self.slack_log.write(traceback.format_exc())
+
+'''
 
     def check_reports(self, r):
 
@@ -145,7 +145,7 @@ class BotMod:
         while True:
 
             try:
-                reported_submissions = r.get_reports('explainlikeimfive')
+                reported_submissions = r.get_reports(self.subreddit)
 
                 for submission in reported_submissions:
 
@@ -178,6 +178,7 @@ class BotMod:
 
             time.sleep(10)
 
+'''
 
 
 

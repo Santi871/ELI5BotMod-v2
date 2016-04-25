@@ -2,25 +2,25 @@ import sys
 import eli5bot
 import os
 import time
-import configparser
 from slacksocket import SlackSocket
+from configparser import ConfigParser
 
 
 def main():
-    s = SlackSocket(os.environ['SLACK_TOKEN'], translate=True)
+    # Get the default Slack channel from config
+    config = ConfigParser()
+    config.read('config.ini')
+    default_channel = config.get('slack', 'default_channel')
 
-    # config = configparser.ConfigParser()
-    # config.read('config.ini')
+    # Create a SlackSocket instance with select filters
+    event_filters = ['message']
+    s = SlackSocket(os.environ['SLACK_TOKEN'], translate=True, event_filters=event_filters)
 
+    # Try to create an instance of the bot
     try:
-        botmod = eli5bot.BotMod(s, use_database=True)
+        botmod = eli5bot.BotMod(s)
     except Exception as e:
-        msg = s.send_msg('Failed to start bot.\n Exception: %s' % e, channel_name="eli5bot-log")
-        sys.exit()
-
-    time.sleep(2)
-
-    botmod.create_thread(botmod.check_reports)
+        msg = s.send_msg('Failed to start bot.\n Exception: %s' % e, channel_name=default_channel)
 
 if __name__ == '__main__':
     main()
