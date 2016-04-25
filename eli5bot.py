@@ -19,9 +19,15 @@ class CreateThread(threading.Thread):
         self.r = r
 
     def run(self):
-        print("Starting " + self.name)
-        methodToRun = self.method(self.r)
-        print("Exiting " + self.name)
+
+        while True:
+            try:
+                print("Starting " + self.name)
+                methodToRun = self.method(self.r)
+                print("Exiting " + self.name)
+            except Exception as e:
+                print("Failure in thread '%s', exception: %s" % (self.name, e))
+                time.sleep(1)
 
 
 class BotMod:
