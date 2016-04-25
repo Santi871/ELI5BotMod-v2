@@ -117,6 +117,10 @@ class BotMod:
                     try:
                         if args[0][0] == "!":
                             getattr(self.command_handler, command)(r, args_dict)
+                    except AttributeError:
+                        self.s.send_msg('Command not found. Use !commands to see a list of available commands',
+                                        channel_name=channel)
+                        continue
                     except Exception as e:
                         self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel)
                         self.slack_log.write(traceback.format_exc())
