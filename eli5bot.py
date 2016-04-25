@@ -30,14 +30,15 @@ class BotMod:
 
     """Main class for BotMod"""
 
-    def __init__(self, s, devmode=False, use_database=False, use_commands=True, use_filters=True, slack_log=True):
+    def __init__(self, s, devmode=False, use_database=False, use_commands=True, use_filters=True, use_slack_log=True):
 
-        if slack_log:
+        slack_log = None
+
+        if use_slack_log:
             from modules import slacklogger
-            old_stdout = sys.stdout
-            sys.stdout = slacklogger.SlackLogger(old_stdout, s, 'eli5bot-log')
+            slack_log = slacklogger.SlackLogger(s, 'eli5bot-log')
 
-        print("Initializing BotMod...")
+        print("Initializing BotMod...", file=slack_log)
         self.s = s
         self.devmode = devmode
         self.use_database = use_database
