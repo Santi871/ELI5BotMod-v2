@@ -5,9 +5,9 @@ class SlackLogger:
 
     """This class pipes stdout a Slack channel"""
 
-    def __init__(self, s, channel):
+    def __init__(self, old_stdout, s, channel):
         self.s = s
-        self.terminal = sys.stdout
+        self.terminal = old_stdout
         self.channel = channel
 
     def write(self, message):

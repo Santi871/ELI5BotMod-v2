@@ -34,7 +34,8 @@ class BotMod:
 
         if slack_log:
             from modules import slacklogger
-            sys.stdout = slacklogger.SlackLogger(s, 'eli5bot-log')
+            old_stdout = sys.stdout
+            sys.stdout = slacklogger.SlackLogger(old_stdout, s, 'eli5bot-log')
 
         print("Initializing BotMod...")
         self.s = s
