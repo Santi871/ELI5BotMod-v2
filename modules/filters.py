@@ -103,9 +103,17 @@ class Filters:
 
     def run_filters(self, submission):
 
+        passed_list = []
+
         for filter_method in self.filters:
 
-            getattr(self, filter_method)(submission)
+            passed = getattr(self, filter_method)(submission)
+            passed_list.append(passed)
+
+        if False in passed_list:
+            return False
+        else:
+            return True
 
     # -------------- DEFINE FILTERS HERE --------------
 
@@ -115,12 +123,14 @@ class Filters:
             title_words_list = nltk.word_tokenize(submission.title.lower())
 
             broken_event = self._get_broken_cur_event(title_words_list)
+            self.already_checked_cur_events.append(submission.id)
 
             if broken_event is not None:
                 # submission.remove()
                 submission.report("Current event: %s" % broken_event)
-
-            self.already_checked_cur_events.append(submission.id)
+                return False
+            else:
+                return True
 
     def search_reposts(self, submission):
 
@@ -197,6 +207,7 @@ class Filters:
                     msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
 
                     submission.report("Potential repost")
+                    return False
 
                 if total_in_threehours >= 3:
                     msg_string = "---\n*Potential large influx of question*\n" + \
@@ -206,3 +217,6 @@ class Filters:
                     msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
 
                     self._create_c_events_rule(search_results_in_last_threehours)
+                    return False
+
+            return True
