@@ -117,7 +117,6 @@ class BotMod:
 
                 try:
                     if split_message[0][0] == "!":
-                        print(command, file=self.slack_log)
                         getattr(self.command_handler, command)(r, eventobj.event)
                 except AttributeError:
                     self.s.send_msg('Command not found. Use !commands to see a list of available commands',
