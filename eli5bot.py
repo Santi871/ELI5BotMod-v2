@@ -56,7 +56,6 @@ class BotMod:
         print("----------------------", file=self.slack_log)
         print("Initializing BotMod...", file=self.slack_log)
         self.s = s
-        self.listening = False
 
         # Authenticate with reddit via OAuth2
         print("Connecting to reddit...", file=self.slack_log)
@@ -73,6 +72,8 @@ class BotMod:
             print("Connecting to database...")
             self.db = database.Database()  # Create a database object
             print("Connected to database.")
+        else:
+            self.db = None
 
         # If we are using the commands module
         if use_commands:
