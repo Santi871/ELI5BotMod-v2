@@ -1,11 +1,8 @@
 import praw
 import os
 import puni
-import datetime
-import urllib.parse
-import psycopg2
 import time
-import nltk
+import sys
 import threading
 
 
@@ -33,7 +30,11 @@ class BotMod:
 
     """Main class for BotMod"""
 
-    def __init__(self, s, devmode=False, use_database=False, use_commands=True, use_filters=True):
+    def __init__(self, s, devmode=False, use_database=False, use_commands=True, use_filters=True, slack_log=True):
+
+        if slack_log:
+            from modules import slacklogger
+            sys.stdout = slacklogger.SlackLogger(sys.stdout, s, 'eli5bot-log')
 
         print("Initializing BotMod...")
         self.s = s
