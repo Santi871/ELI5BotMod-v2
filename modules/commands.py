@@ -268,28 +268,30 @@ class CommandsHandler:
 
         plt.clf()
 
-    def addrule(self, *args):
+    def rules(self, *args):
 
-        """!addrule [words to be filtered]: Creates a rule to filter new questions that contain ALL the words passed"""
+        """!rules add [words to be filtered]: Creates a rule to filter new questions that contain ALL the words passed"""
 
         slack_args = args[1]
         split_text = slack_args['text'].split()
 
         if slack_args['user'] in self.usergroup_owner:
 
-            self.s.send_msg("*This rule will filter submissions containing ALL of the following words:* " +
-                            ' '.join(split_text[1:]), channel_name=slack_args['channel'], confirm=False)
+            if split_text[1] == 'add':
 
-            confirmed = utilities.prompt_command_confirm(self.s, slack_args['channel'])
+                self.s.send_msg("*This rule will filter submissions containing ALL of the following words:* " +
+                                ' '.join(split_text[1:]), channel_name=slack_args['channel'], confirm=False)
 
-            if confirmed:
+                confirmed = utilities.prompt_command_confirm(self.s, slack_args['channel'])
 
-                self.db.insert_entry('recent_event', event_keywords=split_text[1:])
+                if confirmed:
 
-                msg = self.s.send_msg('*Will now filter submissions containing:* ' + ' '.join(split_text[1:]),
-                                      channel_name=slack_args['channel'], confirm=False)
+                    self.db.insert_entry('recent_event', event_keywords=split_text[2:])
+
+                    msg = self.s.send_msg('*Will now filter submissions containing:* ' + ' '.join(split_text[2:]),
+                                          channel_name=slack_args['channel'], confirm=False)
         else:
-            msg = self.s.send_msg('You are not allowed to do that. Yet.',
+            msg = self.s.send_msg('You are not allowed to do that.',
                                   channel_name=slack_args['channel'], confirm=False)
 
     def reboot(self, *args):
