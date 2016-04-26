@@ -100,7 +100,7 @@ class Database:
 
             try:
                 self.cur.execute('''INSERT INTO COMMANDS_LOG(COMMAND, ARGS, AUTHOR, DATETIME) VALUES(%s, &s, &s, &s)''',
-                                 (command, command_args, author, date))
+                                 (str(command), str(command_args), str(author), date))
             finally:
                 self.conn.commit()
 

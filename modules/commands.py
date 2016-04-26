@@ -48,7 +48,7 @@ class CommandsHandler:
 
         r = args[0]
         event_args = args[1]
-        split_event_args = event_args.split()
+        split_event_args = event_args['text'].split()
 
         un = puni.UserNotes(r, r.get_subreddit(self.subreddit))
 
