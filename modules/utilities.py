@@ -1,7 +1,8 @@
-def prompt_command_confirm(s, channel):
+def prompt_command_confirm(s, channel, verbose=True):
 
-    s.send_msg("Are you sure you want to run this command? '!confirm' for yes, '!reject' for no", channel_name=channel,
-               confirm=False)
+    if verbose:
+        s.send_msg("Are you sure you want to run this command? '!confirm' for yes, '!reject' for no",
+                   channel_name=channel, confirm=False)
 
     for eventobj in s.events():
 

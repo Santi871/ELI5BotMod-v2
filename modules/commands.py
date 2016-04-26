@@ -277,10 +277,17 @@ class CommandsHandler:
 
         if slack_args['user'] in self.usergroup_owner:
 
-            self.db.insert_entry('recent_event', event_keywords=split_text[1:])
+            self.s.send_msg("This rule will filter submissions containing ALL of the following words " +
+                            ' '.join(split_text[1:]), channel_name=slack_args['channel'], confirm=False)
 
-            msg = self.s.send_msg('*Will now filter submissions containing:* ' + ' '.join(split_text[1:]),
-                                  channel_name=slack_args['channel'], confirm=False)
+            confirmed = utilities.prompt_command_confirm(self.s, slack_args['channel'])
+
+            if confirmed:
+
+                self.db.insert_entry('recent_event', event_keywords=split_text[1:])
+
+                msg = self.s.send_msg('*Will now filter submissions containing:* ' + ' '.join(split_text[1:]),
+                                      channel_name=slack_args['channel'], confirm=False)
         else:
             msg = self.s.send_msg('You are not allowed to do that. Yet.',
                                   channel_name=slack_args['channel'], confirm=False)
