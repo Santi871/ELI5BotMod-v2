@@ -48,15 +48,16 @@ class CommandsHandler:
 
         r = args[0]
         event_args = args[1]
+        split_event_args = event_args.split()
 
         un = puni.UserNotes(r, r.get_subreddit(self.subreddit))
 
-        if event_args['user'] in self.usergroup_mod:
+        if split_event_args['user'] in self.usergroup_mod:
 
-            if len(event_args['text']) >= 3:
+            if len(split_event_args) >= 3:
 
-                self.s.send_msg('Shadowbanning user "%s" for reason "%s"...' % (event_args['text'][1],
-                                                                                ' '.join(event_args['text'][2:])),
+                self.s.send_msg('Shadowbanning user "%s" for reason "%s"...' % (split_event_args[1],
+                                                                                ' '.join(split_event_args[2:])),
                                 channel_name=event_args['channel'], confirm=False)
 
                 wiki_page = r.get_wiki_page(self.subreddit, "config/automoderator")
@@ -64,12 +65,12 @@ class CommandsHandler:
 
                 beg_ind = wiki_page_content.find("shadowbans")
                 end_ind = wiki_page_content.find("#end shadowbans", beg_ind)
-                username = event_args['text'][1]
-                reason = event_args['text'][2:]
+                username = split_event_args[1]
+                reason = split_event_args[2:]
 
                 try:
                     if self.db is not None:
-                        self.db.insert_entry("shadowban", user=username, reason=reason, author=event_args['user'])
+                        self.db.insert_entry("shadowban", user=username, reason=reason, author=vent_args['user'])
 
                     n = puni.Note(username, "Shadowbanned, reason: %s" % reason, event_args['user'], '', 'botban')
                     un.add_note(n)
@@ -105,6 +106,7 @@ class CommandsHandler:
 
         r = args[0]
         slack_args = args[1]
+        split_text = slack_args['text'].split()
 
         msg = self.s.send_msg('Generating summary, please allow a few seconds...', channel_name=slack_args['channel'],
                               confirm=False)
@@ -126,7 +128,7 @@ class CommandsHandler:
                                   'tumblrinaction', 'offensivespeech', 'bixnood')
         total_negative_karma = 0
         limit = 500
-        user = r.get_redditor(slack_args['text'][1])
+        user = r.get_redditor(split_text[1])
         x = []
         y = []
         s = []
@@ -230,7 +232,7 @@ class CommandsHandler:
         plt.pie(sizes, labels=labels, colors=colors,
                 autopct=None, startangle=90)
         plt.axis('equal')
-        plt.title('User summary for /u/' + slack_args['text'][1], loc='center', y=1.2)
+        plt.title('User summary for /u/' + split_text[1], loc='center', y=1.2)
 
         ax1 = plt.subplot(3, 1, 2)
         x_inv = list(reversed(x))
@@ -245,7 +247,7 @@ class CommandsHandler:
         plt.xlabel('Comment date')
         plt.ylabel('Total comment karma')
 
-        filename = slack_args['text'][1] + "_summary.png"
+        filename = split_text[1] + "_summary.png"
 
         figure = plt.gcf()
         figure.set_size_inches(11, 12)
@@ -255,12 +257,12 @@ class CommandsHandler:
         path = "/app/" + filename
 
         link = self.imgur.upload_from_path(path, config=None, anon=True)
-        msg = self.s.send_msg("Showing summary for */u/" + slack_args['text'][1] +
+        msg = self.s.send_msg("Showing summary for */u/" + split_text[1] +
                               "*. Total comments read: %d" % total_comments_read, channel_name=slack_args['channel'])
         msg = self.s.send_msg(link['link'], channel_name=slack_args['channel'], confirm=False)
         msg = self.s.send_msg("*Troll likelihood (experimental):* " + troll_likelihood,
                               channel_name=slack_args['channel'], confirm=False)
-        msg = self.s.send_msg('*User profile:* ' + "https://www.reddit.com/user/" + slack_args['text'][1],
+        msg = self.s.send_msg('*User profile:* ' + "https://www.reddit.com/user/" + split_text[1],
                               channel_name=slack_args['channel'], confirm=False)
 
         plt.clf()
@@ -270,10 +272,11 @@ class CommandsHandler:
         """!addrule [words to be filtered]: Creates a rule to filter new questions that contain ALL the words passed"""
 
         slack_args = args[1]
+        split_text = slack_args['text'].split()
 
-        self.db.insert_entry('recent_event', event_keywords=slack_args['text'][1:])
+        self.db.insert_entry('recent_event', event_keywords=split_text[1:])
 
-        msg = self.s.send_msg('*Will now filter submissions containing:* ' + ' '.join(slack_args['text'][1:]),
+        msg = self.s.send_msg('*Will now filter submissions containing:* ' + ' '.join(split_text[1:]),
                               channel_name=slack_args['channel'], confirm=False)
 
     def reboot(self, *args):
@@ -292,9 +295,10 @@ class CommandsHandler:
         """!unmoderated [action]: Perform [action] on the unmoderated queue. Actions: flush (approve everything)"""
 
         slack_args = args[1]
+        split_text = slack_args['text'].split()
         r = args[0]
 
-        if slack_args['text'][1] == "flush":
+        if split_text[1] == "flush":
             self.s.send_msg('Approving all submissions in unmoderated queue, please wait...',
                             channel_name=slack_args['channel'], confirm=False)
             unmoderated_submissions = r.get_unmoderated(self.subreddit)
