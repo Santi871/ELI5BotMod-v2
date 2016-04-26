@@ -1,4 +1,9 @@
+from time import sleep
+
+
 def prompt_command_confirm(s, channel, verbose=True):
+
+    sleep(1)
 
     if verbose:
         s.send_msg("Are you sure you want to run this command? '!confirm' for yes, '!reject' for no",
