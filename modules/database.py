@@ -53,6 +53,14 @@ class Database:
             "(ID SERIAL PRIMARY KEY,"
             "EVENT_KEYWORDS TEXT UNIQUE)")
 
+        self.cur.execute(
+            "CREATE TABLE IF NOT EXISTS COMMANDS_LOG"
+            "(ID SERIAL PRIMARY KEY,"
+            "COMMAND TEXT,"
+            "ARGS TEXT,"
+            "AUTHOR TEXT,"
+            "DATETIME TEXT)")
+
         self.conn.commit()
 
     def insert_entry(self, entry_type, **kwargs):\
@@ -77,6 +85,21 @@ class Database:
 
             try:
                 self.cur.execute('''INSERT INTO CURRENT_EVENTS(EVENT_KEYWORDS) VALUES(%s)''', (event_keywords_string,))
+            finally:
+                self.conn.commit()
+
+        if entry_type == 'command':
+
+            slack_event = kwargs['slack_event']
+            split_message = slack_event.get('text').split()
+            command = split_message[0]
+            command_args = split_message[1:]
+            author = slack_event.get('user')
+            date = str(datetime.datetime.utcnow())
+
+            try:
+                self.cur.execute('''INSERT INTO COMMANDS_LOG(COMMAND, ARGS, AUTHOR, DATETIME) VALUES(%s, &s, &s, &s)''',
+                                 (command, command_args, author, date))
             finally:
                 self.conn.commit()
 
