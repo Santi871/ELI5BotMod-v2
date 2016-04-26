@@ -275,10 +275,15 @@ class CommandsHandler:
         slack_args = args[1]
         split_text = slack_args['text'].split()
 
-        self.db.insert_entry('recent_event', event_keywords=split_text[1:])
+        if slack_args['user'] in self.usergroup_owner:
 
-        msg = self.s.send_msg('*Will now filter submissions containing:* ' + ' '.join(split_text[1:]),
-                              channel_name=slack_args['channel'], confirm=False)
+            self.db.insert_entry('recent_event', event_keywords=split_text[1:])
+
+            msg = self.s.send_msg('*Will now filter submissions containing:* ' + ' '.join(split_text[1:]),
+                                  channel_name=slack_args['channel'], confirm=False)
+        else:
+            msg = self.s.send_msg('You are not allowed to do that. Yet.',
+                                  channel_name=slack_args['channel'], confirm=False)
 
     def reboot(self, *args):
 

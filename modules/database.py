@@ -98,6 +98,7 @@ class Database:
             author = slack_event.get('user')
             date = str(datetime.datetime.utcnow())
 
+
             try:
                 self.cur.execute('''INSERT INTO COMMANDS_LOG(COMMAND, ARGS, AUTHOR, DATETIME) VALUES(%s,%s,%s,NOW())''',
                                  (command, command_args, author))
