@@ -113,7 +113,8 @@ class BotMod:
             if eventobj.event.get('text') is not None and eventobj.event.get('user') != 'eli5-bot':
 
                 channel = eventobj.event.get('channel')
-                split_message = eventobj.event.get('text').split()
+                message = eventobj.event.get('text')
+                split_message = message.split()
                 command = split_message[0][1:]
 
                 try:

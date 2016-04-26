@@ -12,5 +12,4 @@ class SlackLogger:
         self.channel = channel
 
     def write(self, message):
-        self.s.send_msg("---", channel_name=self.channel, confirm=False)
         self.s.send_msg(message, channel_name=self.channel, confirm=False)
