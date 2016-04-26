@@ -280,7 +280,7 @@ class CommandsHandler:
             self.s.send_msg("This rule will filter submissions containing ALL of the following words " +
                             ' '.join(split_text[1:]), channel_name=slack_args['channel'], confirm=False)
 
-            confirmed = utilities.prompt_command_confirm(self.s, slack_args['channel'])
+            confirmed = utilities.prompt_command_confirm(self.s, slack_args['channel'], verbose=False)
 
             if confirmed:
 
