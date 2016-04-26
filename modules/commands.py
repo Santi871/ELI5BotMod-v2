@@ -52,7 +52,7 @@ class CommandsHandler:
 
         un = puni.UserNotes(r, r.get_subreddit(self.subreddit))
 
-        if split_event_args['user'] in self.usergroup_mod:
+        if event_args['user'] in self.usergroup_mod:
 
             if len(split_event_args) >= 3:
 
