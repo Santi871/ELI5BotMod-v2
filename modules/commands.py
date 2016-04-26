@@ -271,9 +271,7 @@ class CommandsHandler:
     def rules(self, *args):
 
         """!rules add [words to be filtered]: Creates a rule to filter new questions that contain
-        ALL the words passed
-
-        """
+        ALL the words passed"""
 
         slack_args = args[1]
         split_text = slack_args['text'].split()
