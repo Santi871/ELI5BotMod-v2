@@ -277,10 +277,10 @@ class CommandsHandler:
 
         if slack_args['user'] in self.usergroup_owner:
 
-            self.s.send_msg("This rule will filter submissions containing ALL of the following words " +
+            self.s.send_msg("*This rule will filter submissions containing ALL of the following words:* " +
                             ' '.join(split_text[1:]), channel_name=slack_args['channel'], confirm=False)
 
-            confirmed = utilities.prompt_command_confirm(self.s, slack_args['channel'], verbose=False)
+            confirmed = utilities.prompt_command_confirm(self.s, slack_args['channel'])
 
             if confirmed:
 
