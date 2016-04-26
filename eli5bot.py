@@ -137,7 +137,7 @@ class BotMod:
         while True:
 
             try:
-                for submission in praw.helpers.submission_stream(r, self.subreddit, limit=50, verbosity=0):
+                for submission in praw.helpers.submission_stream(r, self.subreddit, limit=10, verbosity=0):
                     self.filters.run_filters(submission)
             except TypeError:
                 time.sleep(1)
