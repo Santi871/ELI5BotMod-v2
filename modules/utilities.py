@@ -12,14 +12,15 @@ def prompt_command_confirm(s, channel):
             split_message = message.split()
             command = split_message[0]
 
-            if command == "!confirm":
-                return True
-            if command == "!reject":
-                s.send_msg("Command rejected.", channel_name=channel, confirm=False)
-                return False
-            else:
-                s.send_msg("A command is pending confirmation: '!confirm' for yes, '!reject' for no",
-                           channel_name=channel, confirm=False)
+            if command[0][0] == '!':
+                if command == "!confirm":
+                    return True
+                if command == "!reject":
+                    s.send_msg("Command rejected.", channel_name=channel, confirm=False)
+                    return False
+                else:
+                    s.send_msg("A command is pending confirmation: '!confirm' for yes, '!reject' for no",
+                               channel_name=channel, confirm=False)
 
 
 class SlackLogger:
