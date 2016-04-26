@@ -70,7 +70,7 @@ class CommandsHandler:
 
                 try:
                     if self.db is not None:
-                        self.db.insert_entry("shadowban", user=username, reason=reason, author=vent_args['user'])
+                        self.db.insert_entry("shadowban", user=username, reason=reason, author=event_args['user'])
 
                     n = puni.Note(username, "Shadowbanned, reason: %s" % reason, event_args['user'], '', 'botban')
                     un.add_note(n)
