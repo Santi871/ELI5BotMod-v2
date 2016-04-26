@@ -258,7 +258,8 @@ class CommandsHandler:
 
         link = self.imgur.upload_from_path(path, config=None, anon=True)
         msg = self.s.send_msg("Showing summary for */u/" + split_text[1] +
-                              "*. Total comments read: %d" % total_comments_read, channel_name=slack_args['channel'])
+                              "*. Total comments read: %d" % total_comments_read, channel_name=slack_args['channel'],
+                              confirm=False)
         msg = self.s.send_msg(link['link'], channel_name=slack_args['channel'], confirm=False)
         msg = self.s.send_msg("*Troll likelihood (experimental):* " + troll_likelihood,
                               channel_name=slack_args['channel'], confirm=False)
