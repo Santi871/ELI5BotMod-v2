@@ -91,7 +91,8 @@ class Database:
         if entry_type == 'command':
 
             slack_event = kwargs['slack_event']
-            split_message = slack_event.get('text').split()
+            message = slack_event.get('text')
+            split_message = message.split()
             command = split_message[0]
             command_args = ' '.join(split_message[1:])
             author = slack_event.get('user')
