@@ -93,7 +93,7 @@ class Database:
             slack_event = kwargs['slack_event']
             split_message = slack_event.get('text').split()
             command = split_message[0]
-            command_args = split_message[1:]
+            command_args = ' '.join(split_message[1:])
             author = slack_event.get('user')
             date = str(datetime.datetime.utcnow())
 
