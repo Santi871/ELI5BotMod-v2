@@ -44,7 +44,7 @@ class CommandsHandler:
 
     def shadowban(self, *args):
 
-        """!shadowban [user] [reason]: Shadowbans [user] and adds usernote [reason] - USERNAME IS CASE SENSITIVE!"""
+        """*!shadowban [user] [reason]:* Shadowbans [user] and adds usernote [reason] - USERNAME IS CASE SENSITIVE!"""
 
         r = args[0]
         event_args = args[1]
@@ -102,7 +102,7 @@ class CommandsHandler:
 
     def summary(self, *args):
 
-        """!summary [user]: generates a summary of [user]"""
+        """*!summary [user]:* generates a summary of [user]"""
 
         r = args[0]
         slack_args = args[1]
@@ -270,7 +270,7 @@ class CommandsHandler:
 
     def rules(self, *args):
 
-        """!rules add [words to be filtered]: Creates a rule to filter new questions that contain
+        """*!rules add [words to be filtered]:* Creates a rule to filter new questions that contain
         ALL the words passed"""
 
         slack_args = args[1]
@@ -297,7 +297,7 @@ class CommandsHandler:
 
     def reboot(self, *args):
 
-        """!reboot: restarts the bot"""
+        """*!reboot:* restarts the bot"""
 
         slack_args = args[1]
 
@@ -312,7 +312,7 @@ class CommandsHandler:
 
     def unmoderated(self, *args):
 
-        """!unmoderated [action]: Perform [action] on the unmoderated queue. Actions: flush (approve everything)"""
+        """*!unmoderated [action]:* Perform [action] on the unmoderated queue. Actions: flush (approve everything)"""
 
         slack_args = args[1]
         split_text = slack_args['text'].split()
