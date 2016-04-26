@@ -8,6 +8,7 @@ import os
 import sys
 from modules import utilities
 
+
 class CommandsHandler:
 
     """This class handles commands, you can define new commands here"""
