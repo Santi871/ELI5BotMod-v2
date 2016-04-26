@@ -73,8 +73,8 @@ class Database:
             author = kwargs['author']
 
             try:
-                self.cur.execute('''INSERT INTO SHADOWBANS(USERNAME, REASON, DATE, BY) VALUES(%s,%s,%s,%s)''',
-                                 (name, reason, date, author))
+                self.cur.execute('''INSERT INTO SHADOWBANS(USERNAME, REASON, DATE, BY) VALUES(%s,%s,NOW(),%s)''',
+                                 (name, reason, author))
             finally:
                 self.conn.commit()
 
@@ -99,8 +99,8 @@ class Database:
             date = str(datetime.datetime.utcnow())
 
             try:
-                self.cur.execute('''INSERT INTO COMMANDS_LOG(COMMAND, ARGS, AUTHOR, DATETIME) VALUES(%s, &s, &s, &s)''',
-                                 (str(command), str(command_args), str(author), date))
+                self.cur.execute('''INSERT INTO COMMANDS_LOG(COMMAND, ARGS, AUTHOR, DATETIME) VALUES(%s,&s,&s,NOW())''',
+                                 (command, command_args, author))
             finally:
                 self.conn.commit()
 
