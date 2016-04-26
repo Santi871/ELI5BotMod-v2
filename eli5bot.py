@@ -69,9 +69,9 @@ class BotMod:
         # If we are using the database module
         if self.use_database:
             from modules import database
-            print("Connecting to database...")
+            print("Connecting to database...", file=self.slack_log)
             self.db = database.Database()  # Create a database object
-            print("Connected to database.")
+            print("Connected to database.", file=self.slack_log)
         else:
             self.db = None
 

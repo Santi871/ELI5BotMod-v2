@@ -307,7 +307,7 @@ class CommandsHandler:
         if split_text[1] == "flush":
             self.s.send_msg('Approving all submissions in unmoderated queue, please wait...',
                             channel_name=slack_args['channel'], confirm=False)
-            unmoderated_submissions = r.get_unmoderated(self.subreddit)
+            unmoderated_submissions = r.get_unmoderated(self.subreddit, limit=None)
             for submission in unmoderated_submissions:
                 submission.approve()
 
