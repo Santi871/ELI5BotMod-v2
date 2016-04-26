@@ -30,7 +30,9 @@ class CommandsHandler:
 
         for name, f in CommandsHandler.__dict__.items():
             if callable(f) and f.__doc__ is not None:
-                self.docs.append(f.__doc__)
+                docstring = f.__doc__
+                new_docstring = docstring.replace('\n', ' ')
+                self.docs.append(new_docstring)
 
     #  ----------- DEFINE COMMANDS HERE -----------
 
