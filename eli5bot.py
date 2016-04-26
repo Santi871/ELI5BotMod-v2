@@ -5,7 +5,7 @@ import time
 import threading
 import traceback
 import configparser
-from modules import slacklogger
+from modules import utilities
 
 
 class CreateThread(threading.Thread):
@@ -50,7 +50,7 @@ class BotMod:
         slack_log_channel = config.get('slack', 'log_channel')
 
         # Get an instance of SlackLogger to print to Slack log channel
-        self.slack_log = slacklogger.SlackLogger(s, slack_log_channel)
+        self.slack_log = utilities.SlackLogger(s, slack_log_channel)
 
         # Initialize some variables and constants
         print("----------------------", file=self.slack_log)

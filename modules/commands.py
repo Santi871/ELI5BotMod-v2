@@ -6,7 +6,7 @@ from imgurpython import ImgurClient
 import puni
 import os
 import sys
-
+from modules import utilities
 
 class CommandsHandler:
 
@@ -291,10 +291,14 @@ class CommandsHandler:
 
         slack_args = args[1]
 
-        self.s.send_msg('Restarting bot...',
-                        channel_name=slack_args['channel'], confirm=False)
+        confirmed = utilities.prompt_command_confirm(self.s, slack_args['channel'])
 
-        os.execl(sys.executable, sys.executable, *sys.argv)
+        if confirmed:
+
+            self.s.send_msg('Restarting bot...',
+                            channel_name=slack_args['channel'], confirm=False)
+
+            os.execl(sys.executable, sys.executable, *sys.argv)
 
     def unmoderated(self, *args):
 
