@@ -273,8 +273,8 @@ class CommandsHandler:
 
     def rules(self, *args):
 
-        """*!rules add [words to be filtered]:* Creates a rule to filter new questions that contain
-        ALL the words passed"""
+        """*!rules [action] [args]:* Actions: add, list, remove. Args: in 'add': words to be filtered, in 'remove': rule
+        id to remove, in 'list': none"""
 
         slack_args = args[1]
         split_text = slack_args['text'].split()
@@ -311,7 +311,7 @@ class CommandsHandler:
 
             elif split_text[1] == 'remove':
 
-                self.s.send_msg('*Removing rule, ID %d...*' % split_text[2],
+                self.s.send_msg('*Attempting to remove rule, ID %s...*' % split_text[2],
                                 channel_name=slack_args['channel'], confirm=False)
 
                 try:
