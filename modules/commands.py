@@ -294,9 +294,28 @@ class CommandsHandler:
 
                     msg = self.s.send_msg('*Will now filter submissions containing:* ' + ' '.join(split_text[2:]),
                                           channel_name=slack_args['channel'], confirm=False)
+
+            elif split_text[1] == 'list':
+
+                rules_list = self.db.retrieve_entries('current_events', table_mode=True)
+
+                self.s.send_msg('*List of currently active rules:*', channel_name=slack_args['channel'], confirm=False)
+
+                msg = ''
+
+                for rule in rules_list:
+
+                    msg += '*ID:* ' + str(rule[0]) + ' *| Rule:* ' + rule[1] + '\n'
+
+                self.s.send_msg(msg, channel_name=slack_args['channel'], confirm=False)
+
         else:
             msg = self.s.send_msg('You are not allowed to do that.',
                                   channel_name=slack_args['channel'], confirm=False)
+
+
+
+
 
     def reboot(self, *args):
 

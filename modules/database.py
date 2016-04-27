@@ -105,16 +105,29 @@ class Database:
             finally:
                 self.conn.commit()
 
-    def retrieve_entries(self, entry_type):
+    def retrieve_entries(self, entry_type, table_mode=False):
 
         if entry_type == 'current_events':
 
-            self.cur.execute('''SELECT EVENT_KEYWORDS FROM CURRENT_EVENTS''')
-            all_events_list = self.cur.fetchall()
+            if not table_mode:
 
-            for index, event in enumerate(all_events_list):
-                all_events_list[index] = event[0].split()
+                self.cur.execute('''SELECT EVENT_KEYWORDS FROM CURRENT_EVENTS''')
+                all_events_list = self.cur.fetchall()
 
-            return all_events_list
+                for index, event in enumerate(all_events_list):
+                    all_events_list[index] = event[0].split()
+
+                return all_events_list
+
+            if table_mode:
+                self.cur.execute('''SELECT * FROM CURRENT_EVENTS''')
+                all_events_list = self.cur.fetchall()
+
+                return all_events_list
+
+
+
+
+
 
 
