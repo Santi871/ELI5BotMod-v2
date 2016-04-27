@@ -279,7 +279,7 @@ class CommandsHandler:
         slack_args = args[1]
         split_text = slack_args['text'].split()
 
-        if slack_args['user'] in self.usergroup_owner:
+        if slack_args['user'] in self.usergroup_mod:
 
             if split_text[1] == 'add':
 
