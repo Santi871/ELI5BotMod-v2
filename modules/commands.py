@@ -315,7 +315,7 @@ class CommandsHandler:
                                 channel_name=slack_args['channel'], confirm=False)
 
                 try:
-                    self.db.remove_entry('current_events', split_text[2])
+                    self.db.delete_entry('current_events', split_text[2])
                     self.s.send_msg('*Successfully removed rule.*',
                                     channel_name=slack_args['channel'], confirm=False)
                 except Exception as e:
