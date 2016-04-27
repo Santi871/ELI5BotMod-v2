@@ -125,6 +125,15 @@ class Database:
 
                 return all_events_list
 
+    def delete_entry(self, table, entry_id):
+
+        if table == 'current_events':
+
+            try:
+                self.cur.execute('''DELETE FROM CURRENT_EVENTS WHERE id=%s''', (entry_id,))
+            finally:
+                self.conn.commit()
+
 
 
 

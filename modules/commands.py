@@ -309,13 +309,22 @@ class CommandsHandler:
 
                 self.s.send_msg(msg, channel_name=slack_args['channel'], confirm=False)
 
+            elif split_text[1] == 'remove':
+
+                self.s.send_msg('*Removing rule, ID %d...*' % split_text[2],
+                                channel_name=slack_args['channel'], confirm=False)
+
+                try:
+                    self.db.remove_entry('current_events', split_text[2])
+                    self.s.send_msg('*Successfully removed rule.*',
+                                    channel_name=slack_args['channel'], confirm=False)
+                except Exception as e:
+                    self.s.send_msg('*Failed to remove rule.*\n*Exception:* ' + str(e),
+                                    channel_name=slack_args['channel'], confirm=False)
+
         else:
             msg = self.s.send_msg('You are not allowed to do that.',
                                   channel_name=slack_args['channel'], confirm=False)
-
-
-
-
 
     def reboot(self, *args):
 
