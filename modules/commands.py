@@ -307,7 +307,7 @@ class CommandsHandler:
                     msg = 'There are no currently active rules.'
                 else:
                     for rule in rules_list:
-                        msg += '*ID:* ' + str(rule[0]) + ' *| Rule:* ' + rule[1] + '\n'
+                        msg += '*ID:* ' + str(rule[0]) + ' *| Rule - submissions containing:* ' + rule[1] + '\n'
 
                 self.s.send_msg(msg, channel_name=slack_args['channel'], confirm=False)
 
