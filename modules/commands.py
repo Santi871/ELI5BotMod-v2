@@ -343,24 +343,6 @@ class CommandsHandler:
 
             os.execl(sys.executable, sys.executable, *sys.argv)
 
-    def unmoderated(self, *args):
-
-        """*!unmoderated [action]:* Perform [action] on the unmoderated queue. Actions: flush (approve everything)"""
-
-        slack_args = args[1]
-        split_text = slack_args['text'].split()
-        r = args[0]
-
-        if split_text[1] == "flush":
-            self.s.send_msg('Approving all submissions in unmoderated queue, please wait...',
-                            channel_name=slack_args['channel'], confirm=False)
-            unmoderated_submissions = r.get_unmoderated(self.subreddit, limit=None)
-            for submission in unmoderated_submissions:
-                submission.approve()
-
-            self.s.send_msg('Done approving submissions in unmoderated queue.',
-                            channel_name=slack_args['channel'], confirm=False)
-
 
 
 
