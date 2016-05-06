@@ -33,7 +33,7 @@ class Filters:
         self.s = s
         self.db = db
         self.already_done_reposts = []
-        self.already_checked_cur_events = []
+        self.already_checked_cur_rules = []
         self.filters = []
         self.subreddit = subreddit
 
@@ -89,22 +89,21 @@ class Filters:
                         channel_name="eli5bot-dev",
                         confirm=False)
 
-    def _get_broken_cur_event(self, title_words_list):
+    def _get_broken_cur_rule(self, title_words_list):
 
-        broken_event = None
+        broken_rule = None
         submission_title = ' '.join(title_words_list)
 
-        current_events = self.db.retrieve_entries('current_events')
+        current_rules = self.db.retrieve_entries('current_events')
 
-        for event in current_events:
+        for rule in current_rules:
 
-            broken_event = event
-
-            if all(x in submission_title for x in event):
+            if all(x in submission_title for x in rule):
+                broken_rule = rule
                 break
 
-        if broken_event is not None:
-            ret = ' '.join(broken_event)
+        if broken_rule is not None:
+            ret = ' '.join(broken_rule)
         else:
             ret = None
 
@@ -126,17 +125,17 @@ class Filters:
 
     # -------------- DEFINE FILTERS HERE --------------
 
-    def check_current_events(self, submission):
+    def check_current_rule(self, submission):
 
-        if submission.id not in self.already_checked_cur_events:
+        if submission.id not in self.already_checked_cur_rules:
             title_words_list = nltk.word_tokenize(submission.title.lower())
 
-            broken_event = self._get_broken_cur_event(title_words_list)
-            self.already_checked_cur_events.append(submission.id)
+            broken_rule = self._get_broken_cur_rule(title_words_list)
+            self.already_checked_cur_rules.append(submission.id)
 
-            if broken_event is not None:
+            if broken_rule is not None:
                 # submission.remove()
-                submission.report("Current event: %s" % broken_event)
+                submission.report("Current rule: %s" % broken_rule)
                 return False
             else:
                 return True
@@ -153,6 +152,7 @@ class Filters:
             search_result_list = []
             total_in_threehours = 0
             title = submission.title.lower()
+            search_url = 'https://www.reddit.com/r/explainlikeimfive/search?q=title%3A%28'
             self.already_done_reposts.append(submission.id)
 
             tokens = nltk.word_tokenize(title)
@@ -178,6 +178,8 @@ class Filters:
 
                 if tag in self.tags:
                     words_list.append(word)
+                    search_url += word + '+'
+            search_url += '&restrict_sr=on&sort=relevance&t=all'
 
             search_query = ' '.join(words_list)
             full_search_query = "title:(" + search_query + ")"
@@ -209,13 +211,24 @@ class Filters:
                     if self.verbose:
                         msg_string = "---\n*Potential repost detected*\n" + \
                                      title + '\n' + "*POS tagger output:* " + str(tagged) + '\n' + \
-                                     '*Link:* ' + submission.permalink + '\n' + "*Search query:* " + full_search_query + \
-                                     '\n' + '*Search results:*\n'
+                                     '*Link:* ' + submission.permalink + '\n' + "*Search query:* " +\
+                                     full_search_query + '\n' + '*Search results:*\n'
 
                         for item in search_result_list:
                             msg_string += str(item) + '\n'
 
                         msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
+
+                    msg_mods_url = ("https://www.reddit.com/message/compose?to=%2Fr%2Fexplainlikeimfive&subject=I%20"
+                                    "believe%20my%20post%20is%20not%20a%20repost&message=")
+
+                    reddit_msg = """Hi!\n\nI've ran a search for you, and it seems this is commonly asked question. You
+                                    can see the results of the search I've performed [here](""" +\
+                                 search_url + ')' +\
+                                 "\n\nIf you believe your submission is not a repost, feel free" \
+                                 "to [message the moderators](" + msg_mods_url + ').'
+
+                    reddit_msg_footer = "\n\n---\n\n*I am a bot, and this action was performed automatically.*"
 
                     submission.report("Potential repost")
                     faq_generator.add_entry(submission, search_result_list)
@@ -229,7 +242,6 @@ class Filters:
 
                     msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
 
-                    self._create_c_events_rule(search_results_in_last_threehours)
                     return False
 
             return True
