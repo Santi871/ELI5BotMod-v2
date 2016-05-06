@@ -2,6 +2,7 @@ import nltk
 import datetime
 import time
 from configparser import ConfigParser
+from modules import faq_generator as faq_generator_module
 
 
 def intersect(titles):
@@ -143,6 +144,7 @@ class Filters:
     def search_reposts(self, submission):
 
         nltk.data.path.append('./nltk_data/')
+        faq_generator = faq_generator_module.FaqGenerator(self.r, self.subreddit)
 
         if submission.id not in self.already_done_reposts:
 
@@ -216,6 +218,8 @@ class Filters:
                         msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
 
                     submission.report("Potential repost")
+                    faq_generator.add_entry(submission, search_result_list)
+
                     return False
 
                 if total_in_threehours >= 3:
