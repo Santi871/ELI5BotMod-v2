@@ -26,7 +26,7 @@ class FaqGenerator:
 
         if len(new_search_results_list) > 3:
 
-            self.wiki_append('------')
+            self.wiki_append('---')
             self.wiki_append('**' + submission.title + '**')
 
             for item in new_search_results_list:
