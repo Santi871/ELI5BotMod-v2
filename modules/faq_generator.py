@@ -4,7 +4,7 @@ class FaqGenerator:
 
         self.r = r
         self.subreddit = subreddit
-        self.wiki_page = self.r.getwiki_page = r.get_wiki_page(self.subreddit, "faq")
+        self.wiki_page = self.r.get_wiki_page(self.subreddit, "faq")
         self.wiki_page_content = self.wiki_page.content_md
 
     def wiki_append(self, string, newline=True):
