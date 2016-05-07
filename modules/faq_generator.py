@@ -29,13 +29,15 @@ class FaqGenerator:
 
         item_str = ''
 
-        item_str += '---'
+        item_str += '---' + '\n\n'
         item_str += '###' + submission.title + '\n\n'
 
-        for item in search_results_list:
+        for index, item in enumerate(search_results_list):
 
-            item_str += "[%s](%s)" % (item.title, item.permalink) + ' **| Number of comments:** ' +\
-                       str(item.num_comments) + ' **| Karma:** ' + str(item.score) + '\n\n'
+            if index > 0:
+
+                item_str += "[%s](%s)" % (item.title, item.permalink) + ' **| Number of comments:** ' +\
+                           str(item.num_comments) + ' **| Karma:** ' + str(item.score) + '\n\n'
 
         self.wiki_append(item_str)
 
