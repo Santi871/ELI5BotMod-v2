@@ -187,7 +187,8 @@ class Filters:
             while True:
 
                 try:
-                    search_result = self.r.search(full_search_query, subreddit=self.subreddit, sort='new')
+                    search_result = self.r.search(full_search_query, subreddit=self.subreddit, sort='new',
+                                                  period='month')
                     search_result_list = list(search_result)
                     break
                 except AssertionError:
@@ -206,7 +207,7 @@ class Filters:
                         total_in_threehours += 1
                         search_results_in_last_threehours.append(item)
 
-                if len(search_result_list) >= 4:
+                if len(search_result_list) >= 2:
 
                     faq_generator.add_entry(submission, search_result_list)
 
