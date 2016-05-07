@@ -34,10 +34,9 @@ class FaqGenerator:
 
         for index, item in enumerate(search_results_list):
 
-            if index > 0:
+            if index > 0 and item.num_comments > 3:
 
-                item_str += "[%s](%s)" % (item.title, item.permalink) + ' **| Number of comments:** ' +\
-                           str(item.num_comments) + ' **| Karma:** ' + str(item.score) + '\n\n'
+                item_str += "[%s](%s)" % (item.title, item.permalink) + '\n\n'
 
         self.wiki_append(item_str)
 
