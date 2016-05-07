@@ -1,7 +1,11 @@
+from time import sleep
+
+
 class FaqGenerator:
 
     def __init__(self, r, subreddit):
 
+        sleep(3)
         self.r = r
         self.subreddit = subreddit
         self.wiki_page = self.r.get_wiki_page(self.subreddit, "faq")
