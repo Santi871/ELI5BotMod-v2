@@ -27,10 +27,10 @@ class FaqGenerator:
             if item.num_comments > 3:
                 new_search_results_list.append(item)
 
-        self.wiki_append('---')
-        self.wiki_append('**' + submission.title + '**')
-
         item_str = ''
+
+        item_str += '---'
+        item_str += '###' + submission.title + '\n\n'
 
         for item in search_results_list:
 
