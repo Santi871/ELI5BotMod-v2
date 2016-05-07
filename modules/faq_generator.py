@@ -11,7 +11,7 @@ class FaqGenerator:
 
         new_wiki = self.wiki_page_content
         if newline:
-            new_wiki += '\n'
+            new_wiki += '\n\n'
         new_wiki += string
         self.r.edit_wiki_page(self.subreddit, "faq", new_wiki)
 
@@ -24,15 +24,13 @@ class FaqGenerator:
             if item.num_comments > 3:
                 new_search_results_list.append(item)
 
-        if len(new_search_results_list) > 3:
+        self.wiki_append('---')
+        self.wiki_append('**' + submission.title + '**')
 
-            self.wiki_append('---')
-            self.wiki_append('**' + submission.title + '**')
+        for item in search_results_list:
 
-            for item in new_search_results_list:
+            item_str = "[%s](%s)" % (item.title, item.permalink) + ' **| Number of comments:** ' +\
+                       str(item.num_comments) + ' **| Karma:** ' + str(item.score)
 
-                item_str = "[%s](%s)" % (item.title, item.permalink) + ' **| Number of comments:** ' +\
-                           str(item.num_comments) + ' **| Karma:** ' + str(item.score)
-
-                self.wiki_append(item_str)
+            self.wiki_append(item_str)
 
