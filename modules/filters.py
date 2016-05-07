@@ -208,6 +208,8 @@ class Filters:
 
                 if len(search_result_list) >= 4:
 
+                    faq_generator.add_entry(submission, search_result_list)
+
                     if self.verbose:
                         msg_string = "---\n*Potential repost detected*\n" + \
                                      title + '\n' + "*POS tagger output:* " + str(tagged) + '\n' + \
@@ -231,7 +233,6 @@ class Filters:
                     reddit_msg_footer = "\n\n---\n\n*I am a bot, and this action was performed automatically.*"
 
                     submission.report("Potential repost")
-                    faq_generator.add_entry(submission, search_result_list)
 
                     return False
 

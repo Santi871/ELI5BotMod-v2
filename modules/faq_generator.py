@@ -31,7 +31,7 @@ class FaqGenerator:
 
             for item in new_search_results_list:
 
-                item_str = "[%s](%s)" % (submission.title, submission.permalink) + '**| Number of comments:** ' +\
+                item_str = "[%s](%s)" % (item.title, item.permalink) + ' **| Number of comments:** ' +\
                            str(item.num_comments) + ' **| Karma:** ' + str(item.score)
 
                 self.wiki_append(item_str)
