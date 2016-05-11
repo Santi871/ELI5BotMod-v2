@@ -25,6 +25,8 @@ class FaqGenerator:
         for word in search_query.split():
             search_url += word + '+'
 
+        search_url = search_url[:-1]
+
         search_url += '%29&restrict_sr=on&sort=relevance&t=all'
 
         item_str = '---' + '\n\n'
