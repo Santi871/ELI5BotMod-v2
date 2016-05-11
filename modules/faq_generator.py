@@ -22,7 +22,7 @@ class FaqGenerator:
 
         search_url = 'https://www.reddit.com/r/explainlikeimfive/search?q=title%3A%28'
 
-        for word in search_query:
+        for word in search_query.split():
             search_url += word + '+'
 
         search_url += '%29&restrict_sr=on&sort=relevance&t=all'
