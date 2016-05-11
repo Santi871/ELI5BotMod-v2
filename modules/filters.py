@@ -208,7 +208,7 @@ class Filters:
 
                 if len(search_result_list) >= 4:
 
-                    faq_generator.add_entry(submission, search_result_list)
+                    faq_generator.add_entry(submission, search_query)
 
                     if self.verbose:
                         msg_string = "---\n*Potential repost detected*\n" + \

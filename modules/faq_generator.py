@@ -18,25 +18,17 @@ class FaqGenerator:
         new_wiki += string
         self.r.edit_wiki_page(self.subreddit, "faq", new_wiki)
 
-    def add_entry(self, submission, search_results_list):
+    def add_entry(self, submission, search_query):
 
-        new_search_results_list = []
+        search_url = 'https://www.reddit.com/r/explainlikeimfive/search?q=title%3A%28'
 
-        for item in search_results_list:
+        for word in search_query:
+            search_url += word + '+'
 
-            if item.num_comments > 3:
-                new_search_results_list.append(item)
+        search_url += '%29&restrict_sr=on&sort=relevance&t=all'
 
-        item_str = ''
-
-        item_str += '---' + '\n\n'
-        item_str += '###' + submission.title + '\n\n'
-
-        for index, item in enumerate(search_results_list):
-
-            if index > 0 and item.num_comments > 3:
-
-                item_str += "[%s](%s)" % (item.title, item.permalink) + '\n\n'
+        item_str = '---' + '\n\n'
+        item_str += '###[' + submission.title + '](' + search_url + ')\n\n'
 
         self.wiki_append(item_str)
 
