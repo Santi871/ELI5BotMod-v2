@@ -61,7 +61,7 @@ class OnlineUsersLogger:
             curtime_string = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             try:
-                self.db.insert_entry('online_users_log', online_users=online_users, curtime=curtime_string)
+                self.db.insert_entry('users_online_log', online_users=online_users, curtime=curtime_string)
             except Exception as e:
                 print(e)
 
