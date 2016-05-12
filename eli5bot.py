@@ -90,6 +90,8 @@ class BotMod:
         # Get an instance of UserNotes
         self.un = puni.UserNotes(self.r, self.r.get_subreddit(self.subreddit))
 
+        self.create_thread(self.log_online_users)
+
         print("Done initializing.", file=self.slack_log)
 
     def create_thread(self, method):
@@ -144,6 +146,11 @@ class BotMod:
                 continue
             except:
                 self.slack_log.write(traceback.format_exc())
+
+    def log_online_users(self, r):
+
+        online_users_logger = utilities.OnlineUsersLogger(r, self.db, self.subreddit)
+        online_users_logger.log_to_database(3600)
 
 '''
 

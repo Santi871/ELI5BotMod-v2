@@ -1,5 +1,5 @@
 from time import sleep
-
+from datetime import datetime
 
 def prompt_command_confirm(s, channel, verbose=True):
 
@@ -43,3 +43,23 @@ class SlackLogger:
     def write(self, message):
         self.s.send_msg(message, channel_name=self.channel, confirm=False)
 
+
+class OnlineUsersLogger:
+
+    def __init__(self, r, db, subreddit):
+        self.r = r
+        self.db = db
+        self.subreddit = subreddit
+
+    def log_to_database(self, interval):
+
+        while True:
+
+            subreddit_obj = self.r.get_subreddit(self.subreddit)
+
+            online_users = subreddit_obj.accounts_active
+            curtime_string = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            self.db.insert_entry('online_users_log', online_users=online_users, curtime=curtime_string)
+
+            sleep(interval)

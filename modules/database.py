@@ -61,6 +61,12 @@ class Database:
             "AUTHOR TEXT,"
             "DATETIME TEXT)")
 
+        self.cur.execute(
+            "CREATE TABLE IF NOT EXISTS USERS_ONLINE_LOG"
+            "(ID SERIAL PRIMARY KEY,"
+            "USERS_ONLINE INTEGER,"
+            "DATETIME TEXT)")
+
         self.conn.commit()
 
     def insert_entry(self, entry_type, **kwargs):\
@@ -102,6 +108,17 @@ class Database:
             try:
                 self.cur.execute('''INSERT INTO COMMANDS_LOG(COMMAND, ARGS, AUTHOR, DATETIME) VALUES(%s,%s,%s,NOW())''',
                                  (command, command_args, author))
+            finally:
+                self.conn.commit()
+
+        if entry_type == 'users_online_log':
+
+            online_users = kwargs['online_users']
+            curtime = kwargs['curtime']
+
+            try:
+                self.cur.execute('''INSERT INTO USERS_ONLINE_LOG(USERS_ONLINE, DATETIME) VALUES(%s,%s)''',
+                                 (online_users, curtime))
             finally:
                 self.conn.commit()
 
