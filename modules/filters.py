@@ -16,6 +16,49 @@ def intersect(titles):
     return list(ret_set)
 
 
+def handle_repost(r, submission, search_query, flair_and_comment=False):
+
+    submission.report("Potential repost (has been flaired as repost)")
+
+    if flair_and_comment:
+
+        search_url = 'https://www.reddit.com/r/explainlikeimfive/search?q=title%3A%28'
+
+        for word in search_query.split():
+            search_url += word + '+'
+
+        search_url = search_url[:-1]
+
+        search_url += '%29&restrict_sr=on&sort=relevance&t=all'
+
+        r.set_flair('explainlikeimfive', submission, flair_text='Repost', flair_css_class='Repost')
+
+        s1 = submission.author
+        s2 = search_url
+        s3 = 'https://www.reddit.com/r/explainlikeimfive/wiki/reposts#wiki_why_we_allow_reposts'
+        s4 = 'https://www.reddit.com/r/explainlikeimfive/wiki/reposts#wiki_how_to_filter_reposts'
+        s5 = 'https://www.reddit.com/message/compose/?to=/r/explainlikeimfive'
+
+        comment = ("""Hi /u/%s,
+
+        I've ran a search for your question and detected it is a commonly asked question, so I've
+                 marked this question as repost. It will still be visible in the subreddit nonetheless.
+
+        **You can see previous similar questions [here](%s).**
+
+        *[Why we allow reposts](%s) | [How to filter out reposts permanently](%s)*
+
+        ---
+
+        *I am a bot, and this action was performed automatically.
+        Please [contact the moderators of this subreddit](%s) if you have any questions or concerns.*
+        """) % (s1, s2, s3, s4, s5)
+
+        comment_obj = submission.add_comment(comment)
+
+        comment_obj.distinguish(sticky=True)
+
+
 class Filters:
 
     """This class implements a set of filters through which submissions can be ran through"""
@@ -233,8 +276,7 @@ class Filters:
 
                     reddit_msg_footer = "\n\n---\n\n*I am a bot, and this action was performed automatically.*"
 
-                    submission.report("Potential repost")
-
+                    handle_repost(self.r, submission, search_query)
                     return False
 
                 if total_in_threehours >= 3:

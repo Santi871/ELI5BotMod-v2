@@ -1,6 +1,7 @@
 from time import sleep
 from datetime import datetime
 
+
 def prompt_command_confirm(s, channel, verbose=True):
 
     sleep(1)
