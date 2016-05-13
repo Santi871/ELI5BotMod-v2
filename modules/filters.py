@@ -265,19 +265,8 @@ class Filters:
 
                         msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
 
-                    msg_mods_url = ("https://www.reddit.com/message/compose?to=%2Fr%2Fexplainlikeimfive&subject=I%20"
-                                    "believe%20my%20post%20is%20not%20a%20repost&message=")
-
-                    reddit_msg = """Hi!\n\nI've ran a search for you, and it seems this is commonly asked question. You
-                                    can see the results of the search I've performed [here](""" +\
-                                 search_url + ')' +\
-                                 "\n\nIf you believe your submission is not a repost, feel free" \
-                                 "to [message the moderators](" + msg_mods_url + ').'
-
-                    reddit_msg_footer = "\n\n---\n\n*I am a bot, and this action was performed automatically.*"
-
                     handle_repost(self.r, submission, search_query)
-                    return False
+                    # return False
 
                 if total_in_threehours >= 3:
                     msg_string = "---\n*Potential large influx of question*\n" + \
@@ -286,6 +275,23 @@ class Filters:
 
                     msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
 
+                    return False
+
+            while True:
+
+                try:
+                    search_result = self.r.search(full_search_query, subreddit=self.subreddit,
+                                                  period='month', sort='new')
+                    search_result_list = list(search_result)
+                    break
+                except AssertionError:
+                    time.sleep(1)
+                    continue
+
+            if search_result_list:
+
+                if len(search_result_list) >= 3:
+                    submission.report("Potential extremely common repost (asked more than once a month)")
                     return False
 
             return True
