@@ -174,7 +174,7 @@ class BotMod:
                 self.slack_log.write(traceback.format_exc())
                 continue
 
-            time.sleep(480)
+            time.sleep(300)
 
 '''
 
