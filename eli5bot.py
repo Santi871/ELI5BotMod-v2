@@ -152,6 +152,19 @@ class BotMod:
         online_users_logger = utilities.OnlineUsersLogger(r, self.db, self.subreddit)
         online_users_logger.log_to_database(3600)
 
+    def scan_posts_between_timestamps(self, r):
+
+        while True:
+
+            try:
+                submissions = praw.helpers.submissions_between(r, 'explainlikeimfive',
+                                                               lowest_timestamp=1459814400)
+
+
+            except:
+                self.slack_log.write(traceback.format_exc())
+                continue
+
 '''
 
     def check_reports(self, r):

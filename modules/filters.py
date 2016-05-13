@@ -18,7 +18,7 @@ def intersect(titles):
 
 def handle_repost(r, submission, search_query, flair_and_comment=False):
 
-    submission.report("Potential repost (has been flaired as repost)")
+    submission.report("Potential repost")
 
     if flair_and_comment:
 
