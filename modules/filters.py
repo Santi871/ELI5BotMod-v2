@@ -187,7 +187,8 @@ class Filters:
             while True:
 
                 try:
-                    search_result = self.r.search(full_search_query, subreddit=self.subreddit, sort='new')
+                    search_result = self.r.search(full_search_query, subreddit=self.subreddit,
+                                                  period='year', sort='new')
                     search_result_list = list(search_result)
                     break
                 except AssertionError:

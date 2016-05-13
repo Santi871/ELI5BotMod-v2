@@ -23,7 +23,9 @@ class CommandsHandler:
 
         self.usergroup_owner = 'santi871'
         self.usergroup_mod = ('santi871', 'akuthia', 'mason11987', 'mike_pants', 'mjcapples', 'securethruobscure',
-                              'snewzie', 'teaearlgraycold', 'thom.willard', 'yarr')
+                              'snewzie', 'teaearlgraycold', 'thom.willard', 'yarr', 'cow_co', 'sterlingphoenix',
+                              'hugepilchard', 'curmudgy', 'h2g2_researcher', 'jim777ps3', 'letstrythisagain_',
+                              'mr_magnus', 'terrorpaw', 'kodack10')
 
         self.imgur = ImgurClient(os.environ['IMGUR_CLIENT_ID'], os.environ['IMGUR_CLIENT_SECRET'])
 
