@@ -5,6 +5,7 @@ import time
 import threading
 import traceback
 import configparser
+import datetime
 from modules import utilities
 
 
@@ -91,6 +92,7 @@ class BotMod:
         self.un = puni.UserNotes(self.r, self.r.get_subreddit(self.subreddit))
 
         self.create_thread(self.log_online_users)
+        # self.create_thread(self.scan_posts_between_timestamps)
 
         print("Done initializing.", file=self.slack_log)
 
@@ -156,14 +158,23 @@ class BotMod:
 
         while True:
 
+            lowest_timestamp = datetime.datetime.now() - datetime.timedelta(minutes=10)
+            highest_timestamp = datetime.datetime.now() - datetime.timedelta(minutes=5)
+
             try:
                 submissions = praw.helpers.submissions_between(r, 'explainlikeimfive',
-                                                               lowest_timestamp=1459814400)
+                                                               lowest_timestamp=lowest_timestamp.timestamp(),
+                                                               highest_timestamp=highest_timestamp.timestamp())
 
+                for submission in submissions:
+                    if submission.link_flair_text is None:
+                        submission.report("No assigned flair")
 
             except:
                 self.slack_log.write(traceback.format_exc())
                 continue
+
+            time.sleep(480)
 
 '''
 
