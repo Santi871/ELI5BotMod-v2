@@ -198,7 +198,7 @@ Please [contact the moderators of this subreddit](%s) if you believe this is a f
 
                 for submission_tuple in unflaired_submissions_duplicate:
 
-                    refreshed_submission = r.get_submission(submission_id=[0])
+                    refreshed_submission = r.get_submission(submission_id=submission_tuple[0])
 
                     if refreshed_submission.link_flair_text is not None:
                         refreshed_submission.approve()
