@@ -167,6 +167,7 @@ class BotMod:
                                                                highest_timestamp=highest_timestamp.timestamp())
 
                 for submission in submissions:
+                    print(submission, file=self.slack_log)
                     if submission.link_flair_text is None:
                         submission.report("No assigned flair")
 
@@ -174,7 +175,7 @@ class BotMod:
                 self.slack_log.write(traceback.format_exc())
                 continue
 
-            time.sleep(300)
+            time.sleep(60)
 
 '''
 
