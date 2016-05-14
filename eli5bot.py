@@ -198,19 +198,34 @@ Please [contact the moderators of this subreddit](%s) if you believe this is a f
 
                 for submission_tuple in unflaired_submissions_duplicate:
 
+                    print(str(submission_tuple))
+
                     refreshed_submission = r.get_submission(submission_id=submission_tuple[0])
+
+                    print(refreshed_submission.link_flair_text, file=self.slack_log)
 
                     if refreshed_submission.link_flair_text is not None:
                         refreshed_submission.approve()
                         comment_obj = submission_tuple[1]
 
-                        try:
-                            comment_obj.delete()
-                        except:
-                            pass
+                        comment_obj.delete()
 
-                    unflaired_submissions.remove(submission_tuple)
-                    unflaired_submissions_ids.remove(submission_tuple[0])
+                        unflaired_submissions.remove(submission_tuple)
+                        unflaired_submissions_ids.remove(submission_tuple[0])
+
+                    else:
+
+                        submission_time = datetime.datetime.fromtimestamp(refreshed_submission.created_utc)
+                        d = datetime.datetime.now() - submission_time
+                        delta_time = d.total_seconds()
+
+                        if delta_time >= 10800:
+
+                            unflaired_submissions.remove(submission_tuple)
+                            unflaired_submissions_ids.remove(submission_tuple[0])
+
+                            comment_obj = submission_tuple[1]
+                            comment_obj.delete()
 
             except:
                 self.slack_log.write(traceback.format_exc())
