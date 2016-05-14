@@ -161,8 +161,8 @@ class BotMod:
 
         while True:
 
-            lowest_timestamp = datetime.datetime.now() - datetime.timedelta(minutes=10)
-            highest_timestamp = datetime.datetime.now() - datetime.timedelta(minutes=5)
+            lowest_timestamp = datetime.datetime.now() - datetime.timedelta(minutes=7)
+            highest_timestamp = datetime.datetime.now() - datetime.timedelta(minutes=2)
 
             try:
                 submissions = praw.helpers.submissions_between(r, 'explainlikeimfive',
