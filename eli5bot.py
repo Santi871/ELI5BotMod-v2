@@ -92,7 +92,7 @@ class BotMod:
         self.un = puni.UserNotes(self.r, self.r.get_subreddit(self.subreddit))
 
         self.create_thread(self.log_online_users)
-        self.create_thread(self.scan_posts_between_timestamps)
+        self.create_thread(self.handle_unflaired)
 
         print("Done initializing.", file=self.slack_log)
 
@@ -154,7 +154,10 @@ class BotMod:
         online_users_logger = utilities.OnlineUsersLogger(r, self.db, self.subreddit)
         online_users_logger.log_to_database(3600)
 
-    def scan_posts_between_timestamps(self, r):
+    def handle_unflaired(self, r):
+
+        unflaired_submissions_ids = []
+        unflaired_submissions = []
 
         while True:
 
@@ -167,8 +170,43 @@ class BotMod:
                                                                highest_timestamp=highest_timestamp.timestamp())
 
                 for submission in submissions:
-                    if submission.link_flair_text is None:
-                        submission.report("No assigned flair")
+                    if submission.id not in unflaired_submissions_ids and submission.link_flair_text is None:
+
+                        s1 = submission.author
+                        comment = ("""Hi /u/%s,
+
+It looks like you haven't assigned a category flair to your question, so it has been automatically removed.
+You can assign a category flair to your question by clicking the *flair* button under it.
+
+Shortly after you have assigned a category flair to your question, it will be automatically re-approved and this message
+will be deleted.
+
+---
+
+*I am a bot, and this action was performed automatically.
+Please [contact the moderators of this subreddit](%s) if you believe this is a false positive.*
+""") % s1
+                        comment_obj = submission.add_comment(comment)
+                        unflaired_submissions_ids.append(submission.id)
+                        unflaired_submissions.append((submission.id, comment_obj))
+
+                unflaired_submissions_duplicate = unflaired_submissions
+
+                for submission_tuple in unflaired_submissions_duplicate:
+
+                    refreshed_submission = r.get_submission(submission_tuple[0])
+
+                    if refreshed_submission.link_flair_text is not None:
+                        refreshed_submission.approve()
+                        comment_obj = submission_tuple[1]
+
+                        try:
+                            comment_obj.delete()
+                        except:
+                            pass
+
+                    unflaired_submissions.remove(submission_tuple)
+                    unflaired_submissions_ids.remove(submission_tuple[0])
 
             except:
                 self.slack_log.write(traceback.format_exc())
