@@ -7,6 +7,7 @@ import traceback
 import configparser
 import datetime
 from modules import utilities
+import copy
 
 
 class CreateThread(threading.Thread):
@@ -194,7 +195,7 @@ Please [contact the moderators of this subreddit](%s) if you believe this is a f
                         unflaired_submissions_ids.append(submission.id)
                         unflaired_submissions.append((submission.id, comment_obj))
 
-                unflaired_submissions_duplicate = unflaired_submissions
+                unflaired_submissions_duplicate = copy.deepcopy(unflaired_submissions)
 
                 for submission_tuple in unflaired_submissions_duplicate:
 
