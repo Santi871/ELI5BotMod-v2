@@ -50,8 +50,8 @@ I've ran a search for your question and detected it is a commonly asked question
 
 ---
 
-*I am a bot, and this action was performed automatically.
-Please [contact the moderators of this subreddit](%s) if you have any questions or concerns.*
+**This search was performed automatically using keywords from your submission**.
+*Please [contact the moderators of this subreddit](%s) if you believe this is a false positive.*
 """) % (s1, s2, s3, s4, s5)
 
         comment_obj = submission.add_comment(comment)
