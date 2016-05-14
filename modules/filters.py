@@ -265,7 +265,7 @@ class Filters:
 
                         msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
 
-                    handle_repost(self.r, submission, search_query)
+                    handle_repost(self.r, submission, search_query, flair_and_comment=True)
                     # return False
 
                 if total_in_threehours >= 3:
