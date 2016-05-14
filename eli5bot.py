@@ -172,6 +172,8 @@ class BotMod:
                 for submission in submissions:
                     if submission.id not in unflaired_submissions_ids and submission.link_flair_text is None:
 
+                        submission.remove()
+
                         s1 = submission.author
                         comment = ("""Hi /u/%s,
 
