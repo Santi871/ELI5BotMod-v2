@@ -92,7 +92,7 @@ class BotMod:
         self.un = puni.UserNotes(self.r, self.r.get_subreddit(self.subreddit))
 
         self.create_thread(self.log_online_users)
-        # self.create_thread(self.scan_posts_between_timestamps)
+        self.create_thread(self.scan_posts_between_timestamps)
 
         print("Done initializing.", file=self.slack_log)
 
