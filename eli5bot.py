@@ -189,6 +189,7 @@ will be deleted.
 Please [contact the moderators of this subreddit](%s) if you believe this is a false positive.*
 """) % s1
                         comment_obj = submission.add_comment(comment)
+                        comment_obj.distinguish(sticky=True)
                         unflaired_submissions_ids.append(submission.id)
                         unflaired_submissions.append((submission.id, comment_obj))
 
