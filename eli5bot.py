@@ -209,7 +209,7 @@ Please [contact the moderators of this subreddit](%s) if you believe this is a f
                         refreshed_submission.approve()
                         comment_obj = submission_tuple[1]
 
-                        comment_obj.delete()
+                        comment_obj.remove()
 
                         unflaired_submissions.remove(submission_tuple)
                         unflaired_submissions_ids.remove(submission_tuple[0])
@@ -226,7 +226,7 @@ Please [contact the moderators of this subreddit](%s) if you believe this is a f
                             unflaired_submissions_ids.remove(submission_tuple[0])
 
                             comment_obj = submission_tuple[1]
-                            comment_obj.delete()
+                            comment_obj.remove()
 
             except:
                 self.slack_log.write(traceback.format_exc())
