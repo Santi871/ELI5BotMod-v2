@@ -199,15 +199,9 @@ Please [contact the moderators of this subreddit](%s) if you believe this is a f
 
                 for submission_tuple in unflaired_submissions_duplicate:
 
-                    print(str(submission_tuple))
-
                     refreshed_submission = r.get_submission(submission_id=submission_tuple[0])
 
-                    print(refreshed_submission.link_flair_text, file=self.slack_log)
-
                     comment_obj = r.get_info(thing_id=submission_tuple[1])
-
-                    print(comment_obj.permalink)
 
                     if refreshed_submission.link_flair_text is not None:
                         refreshed_submission.approve()
