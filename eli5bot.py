@@ -5,7 +5,9 @@ import time
 import threading
 import traceback
 import configparser
-from modules import slacklogger
+import datetime
+from modules import utilities
+import copy
 
 
 class CreateThread(threading.Thread):
@@ -50,7 +52,7 @@ class BotMod:
         slack_log_channel = config.get('slack', 'log_channel')
 
         # Get an instance of SlackLogger to print to Slack log channel
-        self.slack_log = slacklogger.SlackLogger(s, slack_log_channel)
+        self.slack_log = utilities.SlackLogger(s, slack_log_channel)
 
         # Initialize some variables and constants
         print("----------------------", file=self.slack_log)
@@ -69,9 +71,9 @@ class BotMod:
         # If we are using the database module
         if self.use_database:
             from modules import database
-            print("Connecting to database...")
+            print("Connecting to database...", file=self.slack_log)
             self.db = database.Database()  # Create a database object
-            print("Connected to database.")
+            print("Connected to database.", file=self.slack_log)
         else:
             self.db = None
 
@@ -89,6 +91,9 @@ class BotMod:
 
         # Get an instance of UserNotes
         self.un = puni.UserNotes(self.r, self.r.get_subreddit(self.subreddit))
+
+        self.create_thread(self.log_online_users)
+        self.create_thread(self.handle_unflaired)
 
         print("Done initializing.", file=self.slack_log)
 
@@ -113,15 +118,19 @@ class BotMod:
             if eventobj.event.get('text') is not None and eventobj.event.get('user') != 'eli5-bot':
 
                 channel = eventobj.event.get('channel')
-                split_message = eventobj.event.get('text').split()
+                message = eventobj.event.get('text')
+                split_message = message.split()
                 command = split_message[0][1:]
 
                 try:
                     if split_message[0][0] == "!":
                         getattr(self.command_handler, command)(r, eventobj.event)
+                        if self.db is not None:
+                            self.db.insert_entry('command', slack_event=eventobj.event)
                 except AttributeError:
                     self.s.send_msg('Command not found. Use !commands to see a list of available commands',
                                     channel_name=channel, confirm=False)
+                    self.slack_log.write(traceback.format_exc())
                     continue
                 except Exception as e:
                     self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel,
@@ -133,13 +142,92 @@ class BotMod:
         while True:
 
             try:
-                for submission in praw.helpers.submission_stream(r, self.subreddit, limit=50, verbosity=0):
+                for submission in praw.helpers.submission_stream(r, self.subreddit, limit=10, verbosity=0):
                     self.filters.run_filters(submission)
             except TypeError:
                 time.sleep(1)
                 continue
             except:
                 self.slack_log.write(traceback.format_exc())
+
+    def log_online_users(self, r):
+
+        online_users_logger = utilities.OnlineUsersLogger(r, self.db, self.subreddit)
+        online_users_logger.log_to_database(3600)
+
+    def handle_unflaired(self, r):
+
+        unflaired_submissions_ids = []
+        unflaired_submissions = []
+
+        while True:
+
+            lowest_timestamp = datetime.datetime.now() - datetime.timedelta(minutes=7)
+            highest_timestamp = datetime.datetime.now() - datetime.timedelta(minutes=2)
+
+            try:
+                submissions = praw.helpers.submissions_between(r, 'explainlikeimfive',
+                                                               lowest_timestamp=lowest_timestamp.timestamp(),
+                                                               highest_timestamp=highest_timestamp.timestamp())
+
+                for submission in submissions:
+                    if submission.id not in unflaired_submissions_ids and submission.link_flair_text is None:
+
+                        submission.remove()
+
+                        s1 = submission.author
+                        s2 = 'https://www.reddit.com/message/compose/?to=/r/explainlikeimfive'
+                        comment = ("""Hi /u/%s,
+
+It looks like you haven't assigned a category flair to your question, so it has been automatically removed.
+You can assign a category flair to your question by clicking the *flair* button under it.
+
+Shortly after you have assigned a category flair to your question, it will be automatically re-approved and this message
+will be deleted.
+
+---
+
+*I am a bot, and this action was performed automatically.
+If you think your question isn't the same as the others I've found, please [contact the moderators](%s)*
+""") % (s1, s2)
+                        comment_obj = submission.add_comment(comment)
+                        comment_obj.distinguish(sticky=True)
+                        unflaired_submissions_ids.append(submission.id)
+                        unflaired_submissions.append((submission.id, comment_obj.fullname))
+
+                unflaired_submissions_duplicate = copy.deepcopy(unflaired_submissions)
+
+                for submission_tuple in unflaired_submissions_duplicate:
+
+                    refreshed_submission = r.get_submission(submission_id=submission_tuple[0])
+
+                    comment_obj = r.get_info(thing_id=submission_tuple[1])
+
+                    if refreshed_submission.link_flair_text is not None:
+                        refreshed_submission.approve()
+
+                        comment_obj.remove()
+
+                        unflaired_submissions.remove(submission_tuple)
+                        unflaired_submissions_ids.remove(submission_tuple[0])
+
+                    else:
+
+                        submission_time = datetime.datetime.fromtimestamp(refreshed_submission.created_utc)
+                        d = datetime.datetime.now() - submission_time
+                        delta_time = d.total_seconds()
+
+                        if delta_time >= 10800:
+
+                            unflaired_submissions.remove(submission_tuple)
+                            unflaired_submissions_ids.remove(submission_tuple[0])
+                            comment_obj.remove()
+
+            except:
+                self.slack_log.write(traceback.format_exc())
+                continue
+
+            time.sleep(60)
 
 '''
 

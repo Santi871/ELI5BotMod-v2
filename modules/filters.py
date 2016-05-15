@@ -2,6 +2,7 @@ import nltk
 import datetime
 import time
 from configparser import ConfigParser
+from modules import faq_generator as faq_generator_module
 
 
 def intersect(titles):
@@ -13,6 +14,74 @@ def intersect(titles):
             ret_set = ret_set & set(element)
 
     return list(ret_set)
+
+
+def handle_repost(r, submission, search_query=None, flair_and_comment=False):
+
+    if flair_and_comment and search_query is not None:
+
+        search_url = 'https://www.reddit.com/r/explainlikeimfive/search?q=title%3A%28'
+
+        for word in search_query.split():
+            search_url += word + '+'
+
+        search_url = search_url[:-1]
+
+        search_url += '%29&restrict_sr=on&sort=relevance&t=all'
+
+        submission.report("Potential repost")
+        r.set_flair('explainlikeimfive', submission, flair_text='Repost', flair_css_class='Repost')
+
+        s1 = submission.author
+        s2 = search_url
+        s3 = 'https://www.reddit.com/r/explainlikeimfive/wiki/reposts#wiki_why_we_allow_reposts'
+        s4 = 'https://www.reddit.com/r/explainlikeimfive/wiki/reposts#wiki_how_to_filter_reposts'
+        s5 = 'https://www.reddit.com/message/compose/?to=/r/explainlikeimfive'
+
+        comment = ("""Hi /u/%s,
+
+I've ran a search for your question and detected it is a commonly asked question, so I've
+                 marked this question as repost. It will still be visible in the subreddit nonetheless.
+
+**You can see previous similar questions [here](%s).**
+
+*[Why we allow reposts](%s) | [How to filter out reposts permanently](%s)*
+
+---
+
+**This search was performed automatically using keywords from your submission**.
+*Please [contact the moderators of this subreddit](%s) if you believe this is a false positive.*
+""") % (s1, s2, s3, s4, s5)
+
+        comment_obj = submission.add_comment(comment)
+
+        comment_obj.distinguish(sticky=True)
+
+    elif flair_and_comment and search_query is None:
+
+        r.set_flair('explainlikeimfive', submission, flair_text='Repost', flair_css_class='Repost')
+
+        s1 = submission.author
+        s2 = 'https://www.reddit.com/r/explainlikeimfive/wiki/reposts#wiki_why_we_allow_reposts'
+        s3 = 'https://www.reddit.com/r/explainlikeimfive/wiki/reposts#wiki_how_to_filter_reposts'
+        s4 = 'https://www.reddit.com/message/compose/?to=/r/explainlikeimfive'
+
+        comment = ("""Hi /u/%s,
+
+This question has been marked as a repost as it is a commonly asked question.
+It will still be visible in the subreddit nonetheless.
+
+*[Why we allow reposts](%s) | [How to filter out reposts permanently](%s)*
+
+---
+
+**This search was performed automatically using keywords from your submission**.
+*Please [contact the moderators of this subreddit](%s) if you believe this is a false positive.*
+""") % (s1, s2, s3, s4)
+
+        comment_obj = submission.add_comment(comment)
+
+        comment_obj.distinguish(sticky=True)
 
 
 class Filters:
@@ -32,7 +101,7 @@ class Filters:
         self.s = s
         self.db = db
         self.already_done_reposts = []
-        self.already_checked_cur_events = []
+        self.already_checked_cur_rules = []
         self.filters = []
         self.subreddit = subreddit
 
@@ -88,22 +157,21 @@ class Filters:
                         channel_name="eli5bot-dev",
                         confirm=False)
 
-    def _get_broken_cur_event(self, title_words_list):
+    def _get_broken_cur_rule(self, title_words_list):
 
-        broken_event = None
+        broken_rule = None
         submission_title = ' '.join(title_words_list)
 
-        current_events = self.db.retrieve_entries('current_events')
+        current_rules = self.db.retrieve_entries('current_events')
 
-        for event in current_events:
+        for rule in current_rules:
 
-            broken_event = event
-
-            if all(x in submission_title for x in event):
+            if all(x in submission_title for x in rule):
+                broken_rule = rule
                 break
 
-        if broken_event is not None:
-            ret = ' '.join(broken_event)
+        if broken_rule is not None:
+            ret = ' '.join(broken_rule)
         else:
             ret = None
 
@@ -125,17 +193,17 @@ class Filters:
 
     # -------------- DEFINE FILTERS HERE --------------
 
-    def check_current_events(self, submission):
+    def check_current_rule(self, submission):
 
-        if submission.id not in self.already_checked_cur_events:
+        if submission.id not in self.already_checked_cur_rules:
             title_words_list = nltk.word_tokenize(submission.title.lower())
 
-            broken_event = self._get_broken_cur_event(title_words_list)
-            self.already_checked_cur_events.append(submission.id)
+            broken_rule = self._get_broken_cur_rule(title_words_list)
+            self.already_checked_cur_rules.append(submission.id)
 
-            if broken_event is not None:
+            if broken_rule is not None:
                 # submission.remove()
-                submission.report("Current event: %s" % broken_event)
+                submission.report("Current rule: %s" % broken_rule)
                 return False
             else:
                 return True
@@ -143,6 +211,7 @@ class Filters:
     def search_reposts(self, submission):
 
         nltk.data.path.append('./nltk_data/')
+        faq_generator = faq_generator_module.FaqGenerator(self.r, self.subreddit)
 
         if submission.id not in self.already_done_reposts:
 
@@ -151,6 +220,7 @@ class Filters:
             search_result_list = []
             total_in_threehours = 0
             title = submission.title.lower()
+            search_url = 'https://www.reddit.com/r/explainlikeimfive/search?q=title%3A%28'
             self.already_done_reposts.append(submission.id)
 
             tokens = nltk.word_tokenize(title)
@@ -176,6 +246,8 @@ class Filters:
 
                 if tag in self.tags:
                     words_list.append(word)
+                    search_url += word + '+'
+            search_url += '&restrict_sr=on&sort=relevance&t=all'
 
             search_query = ' '.join(words_list)
             full_search_query = "title:(" + search_query + ")"
@@ -183,7 +255,8 @@ class Filters:
             while True:
 
                 try:
-                    search_result = self.r.search(full_search_query, subreddit=self.subreddit, sort='new')
+                    search_result = self.r.search(full_search_query, subreddit=self.subreddit,
+                                                  period='year', sort='new')
                     search_result_list = list(search_result)
                     break
                 except AssertionError:
@@ -202,21 +275,23 @@ class Filters:
                         total_in_threehours += 1
                         search_results_in_last_threehours.append(item)
 
-                if len(search_result_list) >= 4:
+                if len(search_result_list) >= 5:
+
+                    faq_generator.add_entry(submission, search_query)
 
                     if self.verbose:
                         msg_string = "---\n*Potential repost detected*\n" + \
                                      title + '\n' + "*POS tagger output:* " + str(tagged) + '\n' + \
-                                     '*Link:* ' + submission.permalink + '\n' + "*Search query:* " + full_search_query + \
-                                     '\n' + '*Search results:*\n'
+                                     '*Link:* ' + submission.permalink + '\n' + "*Search query:* " +\
+                                     full_search_query + '\n' + '*Search results:*\n'
 
                         for item in search_result_list:
                             msg_string += str(item) + '\n'
 
                         msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
 
-                    submission.report("Potential repost")
-                    return False
+                    handle_repost(self.r, submission, search_query, flair_and_comment=True)
+                    # return False
 
                 if total_in_threehours >= 3:
                     msg_string = "---\n*Potential large influx of question*\n" + \
@@ -225,7 +300,23 @@ class Filters:
 
                     msg = self.s.send_msg(msg_string, channel_name="eli5bot-dev", confirm=False)
 
-                    self._create_c_events_rule(search_results_in_last_threehours)
+                    return False
+
+            while True:
+
+                try:
+                    search_result = self.r.search(full_search_query, subreddit=self.subreddit,
+                                                  period='month', sort='new')
+                    search_result_list = list(search_result)
+                    break
+                except AssertionError:
+                    time.sleep(1)
+                    continue
+
+            if search_result_list:
+
+                if len(search_result_list) >= 3:
+                    submission.report("Potential extremely common repost (asked more than once a month)")
                     return False
 
             return True
