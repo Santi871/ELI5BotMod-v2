@@ -188,7 +188,7 @@ will be deleted.
 ---
 
 *I am a bot, and this action was performed automatically.
-If you think your question isn't the same as the others I've found, please [contact the moderators](%s)
+If you think your question isn't the same as the others I've found, please [contact the moderators](%s)*
 """) % (s1, s2)
                         comment_obj = submission.add_comment(comment)
                         comment_obj.distinguish(sticky=True)
