@@ -361,7 +361,7 @@ class CommandsHandler:
 
         filters.handle_repost(r, submisssion, search_query=None, flair_and_comment=True)
 
-        self.s.send_msg('Done',
+        self.s.send_msg('Done.',
                         channel_name=slack_args['channel'], confirm=False)
 
 

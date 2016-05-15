@@ -50,7 +50,7 @@ I've ran a search for your question and detected it is a commonly asked question
 ---
 
 **This search was performed automatically using keywords from your submission**.
-*Please [contact the moderators of this subreddit](%s) if you believe this is a false positive.*
+*Please [contact the moderators of this subreddit](%s) if you believe your question is different from the others.*
 """) % (s1, s2, s3, s4, s5)
 
         comment_obj = submission.add_comment(comment)
@@ -76,7 +76,7 @@ It will still be visible in the subreddit nonetheless.
 ---
 
 **This search was performed automatically using keywords from your submission**.
-*Please [contact the moderators of this subreddit](%s) if you believe this is a false positive.*
+*Please [contact the moderators of this subreddit](%s) if you believe your question is different from the others.*
 """) % (s1, s2, s3, s4)
 
         comment_obj = submission.add_comment(comment)
