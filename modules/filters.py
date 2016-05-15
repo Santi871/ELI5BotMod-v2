@@ -69,16 +69,16 @@ I've ran a search for your question and detected it is a commonly asked question
 
         comment = ("""Hi /u/%s,
 
-        I've ran a search for your question and detected it is a commonly asked question, so I've
+I've ran a search for your question and detected it is a commonly asked question, so I've
                          marked this question as repost. It will still be visible in the subreddit nonetheless.
 
-        *[Why we allow reposts](%s) | [How to filter out reposts permanently](%s)*
+*[Why we allow reposts](%s) | [How to filter out reposts permanently](%s)*
 
-        ---
+---
 
-        **This search was performed automatically using keywords from your submission**.
-        *Please [contact the moderators of this subreddit](%s) if you believe this is a false positive.*
-        """) % (s1, s2, s3, s4)
+**This search was performed automatically using keywords from your submission**.
+*Please [contact the moderators of this subreddit](%s) if you believe this is a false positive.*
+""") % (s1, s2, s3, s4)
 
         comment_obj = submission.add_comment(comment)
 
