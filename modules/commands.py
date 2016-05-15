@@ -7,6 +7,7 @@ import puni
 import os
 import sys
 from modules import utilities
+from modules import filters
 
 
 class CommandsHandler:
@@ -344,6 +345,24 @@ class CommandsHandler:
                             channel_name=slack_args['channel'], confirm=False)
 
             os.execl(sys.executable, sys.executable, *sys.argv)
+
+    def repost(self, *args):
+
+        """*!repost:* flairs submission as a repost and leaves sticky boilerplate comment"""
+
+        r = args[0]
+        slack_args = args[1]
+        split_text = slack_args.split()
+
+        self.s.send_msg('Marking submission "%s" as a repost...' % split_text[1],
+                        channel_name=slack_args['channel'], confirm=False)
+
+        submisssion = r.get_submission(submission_id=split_text[1])
+
+        filters.handle_repost(r, submisssion, search_query=None, flair_and_comment=True)
+
+        self.s.send_msg('Done',
+                        channel_name=slack_args['channel'], confirm=False)
 
 
 

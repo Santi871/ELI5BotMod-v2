@@ -16,11 +16,11 @@ def intersect(titles):
     return list(ret_set)
 
 
-def handle_repost(r, submission, search_query, flair_and_comment=False):
+def handle_repost(r, submission, search_query=None, flair_and_comment=False):
 
     submission.report("Potential repost")
 
-    if flair_and_comment:
+    if flair_and_comment and search_query is not None:
 
         search_url = 'https://www.reddit.com/r/explainlikeimfive/search?q=title%3A%28'
 
@@ -53,6 +53,32 @@ I've ran a search for your question and detected it is a commonly asked question
 **This search was performed automatically using keywords from your submission**.
 *Please [contact the moderators of this subreddit](%s) if you believe this is a false positive.*
 """) % (s1, s2, s3, s4, s5)
+
+        comment_obj = submission.add_comment(comment)
+
+        comment_obj.distinguish(sticky=True)
+
+    elif flair_and_comment and search_query is None:
+
+        r.set_flair('explainlikeimfive', submission, flair_text='Repost', flair_css_class='Repost')
+
+        s1 = submission.author
+        s2 = 'https://www.reddit.com/r/explainlikeimfive/wiki/reposts#wiki_why_we_allow_reposts'
+        s3 = 'https://www.reddit.com/r/explainlikeimfive/wiki/reposts#wiki_how_to_filter_reposts'
+        s4 = 'https://www.reddit.com/message/compose/?to=/r/explainlikeimfive'
+
+        comment = ("""Hi /u/%s,
+
+        I've ran a search for your question and detected it is a commonly asked question, so I've
+                         marked this question as repost. It will still be visible in the subreddit nonetheless.
+
+        *[Why we allow reposts](%s) | [How to filter out reposts permanently](%s)*
+
+        ---
+
+        **This search was performed automatically using keywords from your submission**.
+        *Please [contact the moderators of this subreddit](%s) if you believe this is a false positive.*
+        """) % (s1, s2, s3, s4)
 
         comment_obj = submission.add_comment(comment)
 
