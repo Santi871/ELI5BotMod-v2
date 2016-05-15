@@ -193,7 +193,7 @@ Please [contact the moderators of this subreddit](%s) if you believe this is a f
                         comment_obj = submission.add_comment(comment)
                         comment_obj.distinguish(sticky=True)
                         unflaired_submissions_ids.append(submission.id)
-                        unflaired_submissions.append((submission.id, comment_obj))
+                        unflaired_submissions.append((submission.id, comment_obj.fullname))
 
                 unflaired_submissions_duplicate = copy.deepcopy(unflaired_submissions)
 
@@ -205,9 +205,12 @@ Please [contact the moderators of this subreddit](%s) if you believe this is a f
 
                     print(refreshed_submission.link_flair_text, file=self.slack_log)
 
+                    comment_obj = r.get_info(thing_id=submission_tuple[1])
+
+                    print(comment_obj.permalink)
+
                     if refreshed_submission.link_flair_text is not None:
                         refreshed_submission.approve()
-                        comment_obj = submission_tuple[1]
 
                         comment_obj.remove()
 
@@ -224,8 +227,6 @@ Please [contact the moderators of this subreddit](%s) if you believe this is a f
 
                             unflaired_submissions.remove(submission_tuple)
                             unflaired_submissions_ids.remove(submission_tuple[0])
-
-                            comment_obj = submission_tuple[1]
                             comment_obj.remove()
 
             except:
