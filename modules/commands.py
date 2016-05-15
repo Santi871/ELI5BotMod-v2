@@ -352,7 +352,7 @@ class CommandsHandler:
 
         r = args[0]
         slack_args = args[1]
-        split_text = slack_args.split()
+        split_text = slack_args['text'].split()
 
         self.s.send_msg('Marking submission "%s" as a repost...' % split_text[1],
                         channel_name=slack_args['channel'], confirm=False)
