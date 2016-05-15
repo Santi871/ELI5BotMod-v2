@@ -18,8 +18,6 @@ def intersect(titles):
 
 def handle_repost(r, submission, search_query=None, flair_and_comment=False):
 
-    submission.report("Potential repost")
-
     if flair_and_comment and search_query is not None:
 
         search_url = 'https://www.reddit.com/r/explainlikeimfive/search?q=title%3A%28'
@@ -31,6 +29,7 @@ def handle_repost(r, submission, search_query=None, flair_and_comment=False):
 
         search_url += '%29&restrict_sr=on&sort=relevance&t=all'
 
+        submission.report("Potential repost")
         r.set_flair('explainlikeimfive', submission, flair_text='Repost', flair_css_class='Repost')
 
         s1 = submission.author
