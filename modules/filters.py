@@ -68,8 +68,8 @@ I've ran a search for your question and detected it is a commonly asked question
 
         comment = ("""Hi /u/%s,
 
-I've ran a search for your question and detected it is a commonly asked question, so I've
-                         marked this question as repost. It will still be visible in the subreddit nonetheless.
+This question has been marked as a repost as it is a commonly asked question.
+It will still be visible in the subreddit nonetheless.
 
 *[Why we allow reposts](%s) | [How to filter out reposts permanently](%s)*
 
