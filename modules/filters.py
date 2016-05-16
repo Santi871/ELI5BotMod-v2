@@ -75,7 +75,6 @@ It will still be visible in the subreddit nonetheless.
 
 ---
 
-**This search was performed automatically using keywords from your submission**.
 *Please [contact the moderators of this subreddit](%s) if you believe your question is different from the others.*
 """) % (s1, s2, s3, s4)
 
