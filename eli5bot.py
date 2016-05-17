@@ -7,6 +7,7 @@ import traceback
 import configparser
 import datetime
 from modules import utilities
+import requests.exceptions
 import copy
 
 
@@ -147,6 +148,10 @@ class BotMod:
             except TypeError:
                 time.sleep(1)
                 continue
+            except praw.errors.HTTPException:
+                pass
+            except requests.exceptions.ReadTimeout:
+                pass
             except:
                 self.slack_log.write(traceback.format_exc())
 
