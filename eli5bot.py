@@ -149,9 +149,11 @@ class BotMod:
                 time.sleep(1)
                 continue
             except praw.errors.HTTPException:
-                pass
+                time.sleep(1)
+                continue
             except requests.exceptions.ReadTimeout:
-                pass
+                time.sleep(1)
+                continue
             except:
                 self.slack_log.write(traceback.format_exc())
 
