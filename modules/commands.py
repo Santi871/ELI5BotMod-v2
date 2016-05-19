@@ -407,6 +407,7 @@ class CommandsHandler:
 
         path = "/app/" + filename
         link = self.imgur.upload_from_path(path, config=None, anon=True)
+        plt.clf()
         self.s.send_msg(link['link'], channel_name=slack_args['channel'], confirm=False)
 
 
