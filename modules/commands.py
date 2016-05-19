@@ -401,7 +401,7 @@ class CommandsHandler:
         filename = 'onlineusers.png'
 
         figure = plt.gcf()
-        figure.set_size_inches(11, 7)
+        figure.set_size_inches(20, 7)
 
         plt.savefig(filename)
 
