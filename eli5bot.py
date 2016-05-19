@@ -160,7 +160,7 @@ class BotMod:
     def log_online_users(self, r):
 
         online_users_logger = utilities.OnlineUsersLogger(r, self.db, self.subreddit)
-        online_users_logger.log_to_database(3600)
+        online_users_logger.log_to_database(60)
 
     def handle_unflaired(self, r):
 
