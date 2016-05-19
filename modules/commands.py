@@ -1,11 +1,13 @@
 import datetime
 import matplotlib.pyplot as plt
+from matplotlib.dates import DateFormatter
 import numpy as np
 import math
 from imgurpython import ImgurClient
 import puni
 import os
 import sys
+import datetime
 from modules import utilities
 from modules import filters
 
@@ -348,7 +350,7 @@ class CommandsHandler:
 
     def repost(self, *args):
 
-        """*!repost:* flairs submission as a repost and leaves sticky boilerplate comment"""
+        """*!repost [id]:* flairs submission [id] as a repost and leaves sticky boilerplate comment"""
 
         r = args[0]
         slack_args = args[1]
@@ -363,6 +365,49 @@ class CommandsHandler:
 
         self.s.send_msg('Done.',
                         channel_name=slack_args['channel'], confirm=False)
+
+    def onlineusers(self, *args):
+
+        """!onlineusers: generates a plot of online users over time"""
+
+        slack_args = args[1]
+        users = []
+        date_strings = []
+        dates = []
+
+        self.s.send_msg('Generating plot...',
+                        channel_name=slack_args['channel'], confirm=False)
+
+        online_users_tuples = self.db.retrieve_entries('online_users')
+
+        for each_tuple in online_users_tuples:
+
+            users.append(each_tuple[0])
+            date_strings.append(each_tuple[1])
+
+        del date_strings[0]
+        del users[0]
+
+        for date in date_strings:
+            dates.append(datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S"))
+
+        plt.style.use('fivethirtyeight')
+        plt.plot_date(dates, users, '-')
+
+        formatter = DateFormatter('%Y-%m-%d %H:%M')
+        plt.gcf().axes[0].xaxis.set_major_formatter(formatter)
+        plt.title("Users online in ELI5")
+
+        filename = 'onlineusers.png'
+
+        figure = plt.gcf()
+        figure.set_size_inches(11, 7)
+
+        plt.savefig(filename)
+
+        path = "/app/" + filename
+        link = self.imgur.upload_from_path(path, config=None, anon=True)
+        self.s.send_msg(link['link'], channel_name=slack_args['channel'], confirm=False)
 
 
 

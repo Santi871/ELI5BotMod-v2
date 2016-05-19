@@ -142,6 +142,13 @@ class Database:
 
                 return all_events_list
 
+        if entry_type == 'online_users':
+
+            self.cur.execute('''SELECT users_online, datetime FROM users_online_log''')
+            ret = self.cur.fetchall()
+
+            return ret
+
     def delete_entry(self, table, entry_id):
 
         if table == 'current_events':
