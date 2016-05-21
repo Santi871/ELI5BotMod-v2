@@ -17,13 +17,14 @@ class CommandsHandler:
 
     """This class handles commands, you can define new commands here"""
 
-    def __init__(self, obj, s, subreddit, db=None):
+    def __init__(self, obj, s, subreddit, db=None, log):
 
         self.obj = obj
         self.un = None
         self.s = s
         self.db = db
         self.subreddit = subreddit
+        self.log = log
 
         self.usergroup_owner = 'santi871'
         self.usergroup_mod = ('santi871', 'akuthia', 'mason11987', 'mike_pants', 'mjcapples', 'securethruobscure',
@@ -36,12 +37,12 @@ class CommandsHandler:
         self.docs = []
 
         for name, f in CommandsHandler.__dict__.items():
-            if callable(f) and f.__doc__ is not None:
+            if callable(f) and f.__doc__ is not None and name != 'monitor_chat':
                 docstring = f.__doc__
                 new_docstring = docstring.replace('\n', '')
                 self.docs.append(new_docstring)
 
-    def monitor_chat(self, log, r):
+    def monitor_chat(self, r):
 
         for eventobj in self.s.events():
 
@@ -60,12 +61,12 @@ class CommandsHandler:
                 except AttributeError:
                     self.s.send_msg('Command not found. Use !commands to see a list of available commands',
                                     channel_name=channel, confirm=False)
-                    log.write(traceback.format_exc())
+                    self.log.write(traceback.format_exc())
                     continue
                 except Exception as e:
                     self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel,
                                     confirm=False)
-                    log.write(traceback.format_exc())
+                    self.log.write(traceback.format_exc())
 
     #  ----------- DEFINE COMMANDS HERE -----------
 
@@ -104,9 +105,6 @@ class CommandsHandler:
                 reason = split_event_args[2:]
 
                 try:
-                    if self.db is not None:
-                        self.db.insert_entry("shadowban", user=username, reason=reason, author=event_args['user'])
-
                     n = puni.Note(username, "Shadowbanned, reason: %s" % reason, event_args['user'], '', 'botban')
                     un.add_note(n)
 
@@ -120,12 +118,16 @@ class CommandsHandler:
                                      reason='ELI5_ModBot shadowban user "/u/%s" executed by "/u/%s"'
                                      % (username, event_args['user']))
 
+                    if self.db is not None:
+                        self.db.insert_entry("shadowban", user=username, reason=reason, author=event_args['user'])
+
                     self.s.send_msg('Shadowbanned user: ' + "https://www.reddit.com/user/" + username,
                                     channel_name=event_args['channel'], confirm=False)
 
                 except Exception as e:
                     self.s.send_msg('Failed to shadowban user.', channel_name=event_args['channel'], confirm=False)
                     self.s.send_msg('Exception: %s' % e, channel_name=event_args['channel'], confirm=False)
+                    self.log.write(traceback.format_exc())
 
             else:
                 self.s.send_msg('Usage: !shadowban [username] [reason]', channel_name=event_args['channel'],
