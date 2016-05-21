@@ -17,7 +17,7 @@ class CommandsHandler:
 
     """This class handles commands, you can define new commands here"""
 
-    def __init__(self, obj, s, subreddit, db=None, log):
+    def __init__(self, obj, s, subreddit, log, db=None):
 
         self.obj = obj
         self.un = None

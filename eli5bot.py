@@ -81,8 +81,8 @@ class BotMod:
         # If we are using the commands module
         if use_commands:
             from modules import commands as commands_module
-            self.command_handler = commands_module.CommandsHandler(self, self.s, self.subreddit, self.db,
-                                                                   self.slack_log)
+            self.command_handler = commands_module.CommandsHandler(self, self.s, self.subreddit, self.slack_log,
+                                                                   self.db)
             self.create_thread(self.listen_to_chat)  # Start a thread to watch Slack chat
 
         # If we are using the filters module
