@@ -8,6 +8,7 @@ import puni
 import os
 import sys
 import datetime
+import traceback
 from modules import utilities
 from modules import filters
 
@@ -39,6 +40,32 @@ class CommandsHandler:
                 docstring = f.__doc__
                 new_docstring = docstring.replace('\n', '')
                 self.docs.append(new_docstring)
+
+    def monitor_chat(self, log, r):
+
+        for eventobj in self.s.events():
+
+            if eventobj.event.get('text') is not None and eventobj.event.get('user') != 'eli5-bot':
+
+                channel = eventobj.event.get('channel')
+                message = eventobj.event.get('text')
+                split_message = message.split()
+                command = split_message[0][1:]
+
+                try:
+                    if split_message[0][0] == "!":
+                        getattr(CommandsHandler, command)(r, eventobj.event)
+                        if self.db is not None:
+                            self.db.insert_entry('command', slack_event=eventobj.event)
+                except AttributeError:
+                    self.s.send_msg('Command not found. Use !commands to see a list of available commands',
+                                    channel_name=channel, confirm=False)
+                    log.write(traceback.format_exc())
+                    continue
+                except Exception as e:
+                    self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel,
+                                    confirm=False)
+                    log.write(traceback.format_exc())
 
     #  ----------- DEFINE COMMANDS HERE -----------
 

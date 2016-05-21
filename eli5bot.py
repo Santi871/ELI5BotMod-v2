@@ -113,30 +113,7 @@ class BotMod:
 
     def listen_to_chat(self, r):
 
-        # Listen for Slack events
-        for eventobj in self.s.events():
-
-            if eventobj.event.get('text') is not None and eventobj.event.get('user') != 'eli5-bot':
-
-                channel = eventobj.event.get('channel')
-                message = eventobj.event.get('text')
-                split_message = message.split()
-                command = split_message[0][1:]
-
-                try:
-                    if split_message[0][0] == "!":
-                        getattr(self.command_handler, command)(r, eventobj.event)
-                        if self.db is not None:
-                            self.db.insert_entry('command', slack_event=eventobj.event)
-                except AttributeError:
-                    self.s.send_msg('Command not found. Use !commands to see a list of available commands',
-                                    channel_name=channel, confirm=False)
-                    self.slack_log.write(traceback.format_exc())
-                    continue
-                except Exception as e:
-                    self.s.send_msg('Failed to run command. Exception: %s' % e, channel_name=channel,
-                                    confirm=False)
-                    self.slack_log.write(traceback.format_exc())
+        self.command_handler.monitor_chat(self.slack_log, r)
 
     def scan_new_posts(self, r):
 
@@ -148,10 +125,7 @@ class BotMod:
             except TypeError:
                 time.sleep(1)
                 continue
-            except praw.errors.HTTPException:
-                time.sleep(1)
-                continue
-            except requests.exceptions.ReadTimeout:
+            except (praw.errors.HTTPException, requests.exceptions.ReadTimeout):
                 time.sleep(1)
                 continue
             except:
