@@ -55,7 +55,7 @@ class CommandsHandler:
 
                 try:
                     if split_message[0][0] == "!":
-                        getattr(CommandsHandler, command)(r, eventobj.event)
+                        getattr(self, command)(r, eventobj.event)
                         if self.db is not None:
                             self.db.insert_entry('command', slack_event=eventobj.event)
                 except AttributeError:
