@@ -102,7 +102,7 @@ class CommandsHandler:
                 beg_ind = wiki_page_content.find("shadowbans")
                 end_ind = wiki_page_content.find("#end shadowbans", beg_ind)
                 username = split_event_args[1]
-                reason = split_event_args[2:]
+                reason = ' '.join(split_event_args[2:])
 
                 try:
                     n = puni.Note(username, "Shadowbanned, reason: %s" % reason, event_args['user'], '', 'botban')
