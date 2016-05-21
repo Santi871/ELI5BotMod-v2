@@ -86,8 +86,6 @@ class CommandsHandler:
         event_args = args[1]
         split_event_args = event_args['text'].split()
 
-        un = puni.UserNotes(r, r.get_subreddit(self.subreddit))
-
         if event_args['user'] in self.usergroup_mod:
 
             if len(split_event_args) >= 3:
@@ -96,6 +94,7 @@ class CommandsHandler:
                                                                                 ' '.join(split_event_args[2:])),
                                 channel_name=event_args['channel'], confirm=False)
 
+                un = puni.UserNotes(r, r.get_subreddit(self.subreddit))
                 wiki_page = r.get_wiki_page(self.subreddit, "config/automoderator")
                 wiki_page_content = wiki_page.content_md
 
@@ -106,7 +105,6 @@ class CommandsHandler:
 
                 try:
                     n = puni.Note(username, "Shadowbanned, reason: %s" % reason, event_args['user'], '', 'botban')
-                    un.add_note(n)
 
                     replacement = ', "%s"]' % username
 
@@ -121,6 +119,7 @@ class CommandsHandler:
                     if self.db is not None:
                         self.db.insert_entry("shadowban", user=username, reason=reason, author=event_args['user'])
 
+                    un.add_note(n)
                     self.s.send_msg('Shadowbanned user: ' + "https://www.reddit.com/user/" + username,
                                     channel_name=event_args['channel'], confirm=False)
 
