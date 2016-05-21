@@ -396,7 +396,7 @@ class CommandsHandler:
 
     def onlineusers(self, *args):
 
-        """!onlineusers: generates a plot of online users over time"""
+        """*!onlineusers:* generates a plot of online users over time"""
 
         slack_args = args[1]
         users = []
