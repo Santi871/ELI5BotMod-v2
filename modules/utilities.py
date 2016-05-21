@@ -1,5 +1,6 @@
 from time import sleep
 from datetime import datetime
+import requests.exceptions
 
 
 def prompt_command_confirm(s, channel, verbose=True):
@@ -56,14 +57,20 @@ class OnlineUsersLogger:
 
         while True:
 
-            subreddit_obj = self.r.get_subreddit(self.subreddit)
-
-            online_users = subreddit_obj.accounts_active
-            curtime_string = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
             try:
-                self.db.insert_entry('users_online_log', online_users=online_users, curtime=curtime_string)
-            except Exception as e:
-                print(e)
+                subreddit_obj = self.r.get_subreddit(self.subreddit)
 
-            sleep(interval)
+                online_users = subreddit_obj.accounts_active
+                curtime_string = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+                try:
+                    self.db.insert_entry('users_online_log', online_users=online_users, curtime=curtime_string)
+                except Exception as e:
+                    print(e)
+
+                sleep(interval)
+
+            except requests.exceptions.ReadTimeout:
+                sleep(1)
+                continue
+
