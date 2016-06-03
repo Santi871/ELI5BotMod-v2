@@ -144,7 +144,7 @@ class BotMod:
 
         while True:
 
-            lowest_timestamp = datetime.datetime.now() - datetime.timedelta(minutes=7)
+            lowest_timestamp = datetime.datetime.now() - datetime.timedelta(minutes=30)
             highest_timestamp = datetime.datetime.now() - datetime.timedelta(minutes=2)
 
             try:
