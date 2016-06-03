@@ -25,6 +25,7 @@ class CommandsHandler:
         self.db = db
         self.subreddit = subreddit
         self.log = log
+        self.un = None
 
         self.usergroup_owner = 'santi871'
         self.usergroup_mod = ('santi871', 'akuthia', 'mason11987', 'mike_pants', 'mjcapples', 'securethruobscure',
@@ -43,6 +44,8 @@ class CommandsHandler:
                 self.docs.append(new_docstring)
 
     def monitor_chat(self, r):
+
+        self.un = puni.UserNotes(r, r.get_subreddit(self.subreddit))
 
         for eventobj in self.s.events():
 
@@ -94,7 +97,6 @@ class CommandsHandler:
                                                                                 ' '.join(split_event_args[2:])),
                                 channel_name=event_args['channel'], confirm=False)
 
-                un = puni.UserNotes(r, r.get_subreddit(self.subreddit))
                 wiki_page = r.get_wiki_page(self.subreddit, "config/automoderator")
                 wiki_page_content = wiki_page.content_md
 
@@ -119,7 +121,7 @@ class CommandsHandler:
                     if self.db is not None:
                         self.db.insert_entry("shadowban", user=username, reason=reason, author=event_args['user'])
 
-                    un.add_note(n)
+                    self.un.add_note(n)
                     self.s.send_msg('Shadowbanned user: ' + "https://www.reddit.com/user/" + username,
                                     channel_name=event_args['channel'], confirm=False)
 
