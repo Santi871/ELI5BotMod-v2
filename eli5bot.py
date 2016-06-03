@@ -152,7 +152,11 @@ class BotMod:
                                                                lowest_timestamp=lowest_timestamp.timestamp(),
                                                                highest_timestamp=highest_timestamp.timestamp())
 
+                print(str(submissions))
                 for submission in submissions:
+
+                    print(submission.title)
+                    print(submission.link_flair_text)
                     if submission.id not in unflaired_submissions_ids and submission.link_flair_text is None:
 
                         print(submission.id, file=self.slack_log)
