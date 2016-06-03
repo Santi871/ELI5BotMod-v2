@@ -148,19 +148,15 @@ class BotMod:
             highest_timestamp = datetime.datetime.now() - datetime.timedelta(minutes=2)
 
             try:
-                submissions = praw.helpers.submissions_between(r, 'explainlikeimfive',
-                                                               lowest_timestamp=lowest_timestamp.timestamp(),
-                                                               highest_timestamp=highest_timestamp.timestamp())
+                submissions = r.get_subreddit('explainlikeimfive').get_new(limit=50)
 
-                print(str(submissions), file=self.slack_log)
                 for submission in submissions:
 
-                    print(submission.title, file=self.slack_log)
-                    print(submission.link_flair_text, file=self.slack_log)
-                    if submission.id not in unflaired_submissions_ids and submission.link_flair_text is None:
+                    if submission.created > highest_timestamp and \
+                                    submission.id not in unflaired_submissions_ids and\
+                                    submission.link_flair_text is None:
 
                         print(submission.id, file=self.slack_log)
-                        submission.report("Unassigned flair")
                         submission.remove()
 
                         s1 = submission.author
