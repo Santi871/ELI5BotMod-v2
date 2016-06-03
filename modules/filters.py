@@ -16,7 +16,7 @@ def intersect(titles):
     return list(ret_set)
 
 
-def handle_repost(r, submission, search_query=None, flair_and_comment=False):
+def handle_repost(r, submission, search_query=None, flair_and_comment=False, search_url=None):
 
     if flair_and_comment and search_query is not None:
 
@@ -65,6 +65,7 @@ I've ran a search for your question and detected it is a commonly asked question
         s2 = 'https://www.reddit.com/r/explainlikeimfive/wiki/reposts#wiki_why_we_allow_reposts'
         s3 = 'https://www.reddit.com/r/explainlikeimfive/wiki/reposts#wiki_how_to_filter_reposts'
         s4 = 'https://www.reddit.com/message/compose/?to=/r/explainlikeimfive'
+        s5 = search_url
 
         comment = ("""Hi /u/%s,
 
@@ -73,10 +74,12 @@ It will still be visible in the subreddit nonetheless.
 
 *[Why we allow reposts](%s) | [How to filter out reposts permanently](%s)*
 
+**You can see previous similar questions [here](%s).**
+
 ---
 
 *Please [contact the moderators of this subreddit](%s) if you believe your question is different from the others.*
-""") % (s1, s2, s3, s4)
+""") % (s1, s2, s3, s4, s5)
 
         comment_obj = submission.add_comment(comment)
 

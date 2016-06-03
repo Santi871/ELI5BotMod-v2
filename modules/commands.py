@@ -380,21 +380,26 @@ class CommandsHandler:
 
     def repost(self, *args):
 
-        """*!repost [id]:* flairs submission [id] as a repost and leaves sticky boilerplate comment"""
+        """*!repost [id] [search url]:* flairs submission [id] as a repost and leaves sticky boilerplate comment"""
 
         r = args[0]
         slack_args = args[1]
         split_text = slack_args['text'].split()
 
-        self.s.send_msg('Marking submission "%s" as a repost...' % split_text[1],
-                        channel_name=slack_args['channel'], confirm=False)
+        if len(split_text) == 3 and 'search?q' in split_text[2]:
+            self.s.send_msg('Marking submission "%s" as a repost...' % split_text[1],
+                            channel_name=slack_args['channel'], confirm=False)
+            submisssion = r.get_submission(submission_id=split_text[1])
+            filters.handle_repost(r, submisssion, search_query=None, flair_and_comment=True, search_url=split_text[2])
 
-        submisssion = r.get_submission(submission_id=split_text[1])
+            self.s.send_msg('Done.',
+                            channel_name=slack_args['channel'], confirm=False)
 
-        filters.handle_repost(r, submisssion, search_query=None, flair_and_comment=True)
-
-        self.s.send_msg('Done.',
-                        channel_name=slack_args['channel'], confirm=False)
+        else:
+            self.s.send_msg('*Synthax: !repost [id] [search url]*. You must include a link to a search relevant to'
+                            ' the question. If you are unwilling to do so, please flair the post'
+                            ' as a repost in Reddit instead.',
+                            channel_name=slack_args['channel'], confirm=False)
 
     def onlineusers(self, *args):
 
