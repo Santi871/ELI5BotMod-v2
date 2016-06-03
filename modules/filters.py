@@ -64,8 +64,8 @@ I've ran a search for your question and detected it is a commonly asked question
         s1 = submission.author
         s2 = 'https://www.reddit.com/r/explainlikeimfive/wiki/reposts#wiki_why_we_allow_reposts'
         s3 = 'https://www.reddit.com/r/explainlikeimfive/wiki/reposts#wiki_how_to_filter_reposts'
-        s4 = 'https://www.reddit.com/message/compose/?to=/r/explainlikeimfive'
-        s5 = search_url
+        s4 = search_url
+        s5 = 'https://www.reddit.com/message/compose/?to=/r/explainlikeimfive'
 
         comment = ("""Hi /u/%s,
 
