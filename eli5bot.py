@@ -144,9 +144,7 @@ class BotMod:
 
         while True:
 
-            lowest_timestamp = datetime.datetime.now() - datetime.timedelta(minutes=30)
-            highest_timestamp = datetime.datetime.now() - datetime.timedelta(minutes=2)
-
+            highest_timestamp = datetime.datetime.now() - datetime.timedelta(minutes=5)
             try:
                 submissions = r.get_subreddit('explainlikeimfive').get_new(limit=50)
 
@@ -156,7 +154,6 @@ class BotMod:
                                     submission.id not in unflaired_submissions_ids and\
                                     submission.link_flair_text is None:
 
-                        print(submission.id, file=self.slack_log)
                         submission.remove()
 
                         s1 = submission.author
