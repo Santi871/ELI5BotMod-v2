@@ -40,7 +40,7 @@ def handle_repost(r, submission, search_query=None, flair_and_comment=False, sea
 
         comment = ("""Hi /u/%s,
 
-I've ran a search for your question and detected it is a commonly asked question, so I've
+I've run a search for your question and detected it is a commonly asked question, so I've
                  marked this question as repost. It will still be visible in the subreddit nonetheless.
 
 **You can see previous similar questions [here](%s).**
