@@ -166,6 +166,9 @@ You can assign a category flair to your question by clicking the *flair* button 
 Shortly after you have assigned a category flair to your question, it will be automatically re-approved and this message
 will be deleted.
 
+**Mobile users:** some reddit apps don't support flair selection (including the official one). In order to flair your
+question, open it in your phone's web browser and select flair as you would in a desktop computer.
+
 ---
 
 *I am a bot, and this action was performed automatically.
