@@ -158,6 +158,7 @@ class BotMod:
 
                         s1 = submission.author
                         s2 = 'https://www.reddit.com/message/compose/?to=/r/explainlikeimfive'
+                        s3 = submission.permalink
                         comment = ("""Hi /u/%s,
 
 It looks like you haven't assigned a category flair to your question, so it has been automatically removed.
@@ -167,13 +168,14 @@ Shortly after you have assigned a category flair to your question, it will be au
 will be deleted.
 
 **Mobile users:** some reddit apps don't support flair selection (including the official one). In order to flair your
-question, open it in your phone's web browser and select flair as you would in a desktop computer.
+question, open it in your phone's web browser by clicking [this link](%s) and select
+flair as you would in a desktop computer.
 
 ---
 
 *I am a bot, and this action was performed automatically.
 Please [contact the moderators](%s) if you have any questions or concerns*
-""") % (s1, s2)
+""") % (s1, s3, s2)
                         comment_obj = submission.add_comment(comment)
                         comment_obj.distinguish(sticky=True)
                         unflaired_submissions_ids.append(submission.id)
