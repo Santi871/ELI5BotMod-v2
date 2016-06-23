@@ -28,16 +28,11 @@ def test():
     return Response('It works!')
 
 
-# if __name__ == "__main__":
-#     app.run(threaded=True)
-
-
 def main():
     # Get the default Slack channel from config
     config = ConfigParser()
     config.read('config.ini')
     default_channel = config.get('slack', 'default_channel')
-    app.run(threaded=True)
 
     # Create a SlackSocket instance with select filters
     event_filters = ['message']
@@ -50,4 +45,5 @@ def main():
         msg = s.send_msg('Failed to start bot.\n Exception: %s' % e, channel_name=default_channel, confirm=False)
 
 if __name__ == '__main__':
+    app.run(threaded=True)
     main()
