@@ -35,7 +35,7 @@ def test():
 def command():
     print(str(request.form))
     if request.form.get('token') == SLACK_SLASHCMDS_SECRET:
-        response = [{
+        response = {
                         "response_type": "in_channel",
                         "text": "It's 80 degrees right now.",
                         "attachments": [
@@ -43,9 +43,10 @@ def command():
                                                 "text": "Partly cloudy today and tomorrow"
                                             }
                                         ]
-                    }]
+                    }
 
-        return json.dumps(response), 200, {'Content-Type': 'application/json; charset=utf-8'}
+        return Response(json.dumps(response), status=200, mimetype='application/json')
+
     else:
         return Response(), 200
 
