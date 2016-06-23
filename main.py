@@ -45,7 +45,7 @@ def command():
                                     ]
                     }]
 
-        return Response(json.dumps(response),  mimetype='application/json')
+        return json.dumps(response), 200, {'Content-Type': 'application/json; charset=utf-8'}
     else:
         return Response(), 200
 
