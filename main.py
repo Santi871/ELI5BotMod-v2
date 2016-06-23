@@ -35,7 +35,10 @@ def test():
 def command():
     print(str(request.form))
     if request.form.get('token') == SLACK_SLASHCMDS_SECRET:
-        response = [{
+        response = {
+                "text": "Would you like to play a game?",
+                "attachments": [
+        {
             "text": "Choose a game to play",
             "fallback": "You are unable to choose a game",
             "callback_id": "wopr_game",
@@ -68,7 +71,9 @@ def command():
                     }
                 }
             ]
-        }]
+        }
+    ]
+}
 
         return Response(response=json.dumps(response), status=200, mimetype='application/json')
 
