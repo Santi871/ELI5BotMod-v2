@@ -45,7 +45,7 @@ def command():
                                         ]
                     }
 
-        return Response(json.dumps(response), status=200, mimetype='application/json')
+        return Response(response=json.dumps(response), status=200, mimetype='application/json')
 
     else:
         return Response(), 200
