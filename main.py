@@ -32,7 +32,7 @@ def test():
 
 
 @app.route('/slackcommands', methods=['POST'])
-def inbound():
+def command():
     print(str(request.form))
     if request.form.get('token') == SLACK_SLASHCMDS_SECRET:
         response = {"text": "Thank you for the question. An expert will reply soon!"}
