@@ -14,6 +14,7 @@ SLACK_WEBHOOK_SECRET = os.environ.get('SLACK_WEBHOOK_SECRET')
 
 @app.route('/slack', methods=['POST'])
 def inbound():
+    print(str(request.form))
     if request.form.get('token') == SLACK_WEBHOOK_SECRET:
         channel = request.form.get('channel_name')
         username = request.form.get('user_name')
