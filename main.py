@@ -31,7 +31,7 @@ def test():
     return Response('It works!')
 
 
-@app.route('/slackcommands', methods=['POST'])
+@app.route('/summary', methods=['POST'])
 def command():
     print(str(request.form))
     if request.form.get('token') == SLACK_SLASHCMDS_SECRET:
