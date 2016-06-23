@@ -5,11 +5,13 @@ import time
 from slacksocket import SlackSocket
 from configparser import ConfigParser
 from flask import Flask, request, Response
+import json
 
 
 app = Flask(__name__)
 
 SLACK_WEBHOOK_SECRET = os.environ.get('SLACK_WEBHOOK_SECRET')
+SLACK_SLASHCMDS_SECRET = os.environ.get('SLACK_SLASHCMDS_SECRET')
 
 
 @app.route('/slack', methods=['POST'])
@@ -27,6 +29,16 @@ def inbound():
 @app.route('/', methods=['GET'])
 def test():
     return Response('It works!')
+
+
+@app.route('/slackcommands', methods=['POST'])
+def inbound():
+    print(str(request.form))
+    if request.form.get('token') == SLACK_SLASHCMDS_SECRET:
+        response = {"text": "Thank you for the question. An expert will reply soon!"}
+        return json.dumps(response)
+    else:
+        return None
 
 
 def main():
