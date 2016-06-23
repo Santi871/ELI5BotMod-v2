@@ -45,5 +45,5 @@ def main():
         msg = s.send_msg('Failed to start bot.\n Exception: %s' % e, channel_name=default_channel, confirm=False)
 
 if __name__ == '__main__':
-    app.run(threaded=True)
+    app.run(threaded=True, port=process.env.PORT)
     main()
