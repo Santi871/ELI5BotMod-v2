@@ -53,9 +53,9 @@ I've run a search for your question and detected it is a commonly asked question
 *Please [contact the moderators of this subreddit](%s) if you believe your question is different from the others.*
 """) % (s1, s2, s3, s4, s5)
 
-        comment_obj = submission.add_comment(comment)
+        # comment_obj = submission.add_comment(comment)
 
-        comment_obj.distinguish(sticky=True)
+        # comment_obj.distinguish(sticky=True)
 
     elif flair_and_comment and search_query is None:
 
@@ -80,9 +80,9 @@ This question has been marked as a repost as it is a commonly asked question.
 *Please [contact the moderators of this subreddit](%s) if you believe your question is different from the others.*
 """) % (s1, s2, s3, s4, s5)
 
-        comment_obj = submission.add_comment(comment)
+        # comment_obj = submission.add_comment(comment)
 
-        comment_obj.distinguish(sticky=True)
+        # comment_obj.distinguish(sticky=True)
 
 
 class Filters:
