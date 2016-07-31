@@ -49,9 +49,8 @@ class CommandsHandler:
 
         for eventobj in self.s.events():
 
-            print(eventobj.event.get('user'), file=self.log)
             if eventobj.event.get('text') is not None and eventobj.event.get('user') != 'eli5-bot'\
-                    and eventobj.event.get('user') != 'RedditSlacker':
+                    and eventobj.event.get('user') is not None:
 
                 channel = eventobj.event.get('channel')
                 message = eventobj.event.get('text')
